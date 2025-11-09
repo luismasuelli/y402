@@ -31,7 +31,7 @@ class PaymentIdentity(BaseModel):
 
 class PaymentDetails(BaseModel):
     """
-    The payment details (source address, amount, token, ...).
+    This class stands for the payment details (source address, amount, token, ...).
     """
 
     # Canonic fields.
