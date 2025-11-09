@@ -1,7 +1,7 @@
 from typing import Optional
 from y402.core.types.errors import ConditionalDependencyError
 from y402.core.types.payment import SettledPayment
-from y402.triggers.errors import UnsuccessfulWebhookTrigger, ExceptionOnWebhookTrigger
+from y402.triggers.errors import UnsuccessfulWebhookTriggerError, ExceptionOnWebhookTriggerError
 
 
 try:
@@ -36,6 +36,6 @@ def send_payment(webhook_url: str, settled_payment: SettledPayment,
         response = requests.post(webhook_url, headers=headers, json=settled_payment.model_dump(mode="json"),
                                  timeout=timeout)
         if response.status_code not in range(200, 300):
-            raise UnsuccessfulWebhookTrigger(response.status_code, response.content, response.headers)
+            raise UnsuccessfulWebhookTriggerError(response.status_code, response.content, response.headers)
     except Exception as e:
-        raise ExceptionOnWebhookTrigger(e)
+        raise ExceptionOnWebhookTriggerError(e)
