@@ -34,9 +34,8 @@ class FacilitatorClient(BaseFacilitatorClient):
             timeout = 1
         try:
             async with httpx.AsyncClient(timeout=15) as client:
-                response = await client.post(self._config.url, headers=headers,
-                                             json=request.model_dump(mode="json"),
-                                             timeout=timeout)
+                response = await client.post(self._config.url.rstrip("/") + "/settle", headers=headers,
+                                             json=request.model_dump(mode="json"), timeout=timeout)
                 if response.status_code not in range(200, 300):
                     raise Exception()
                 obj = VerifyResponse(**(response.json()))
@@ -62,9 +61,8 @@ class FacilitatorClient(BaseFacilitatorClient):
             timeout = 1
         try:
             async with httpx.AsyncClient(timeout=15) as client:
-                response = await client.post(self._config.url, headers=headers,
-                                             json=request.model_dump(mode="json"),
-                                             timeout=timeout)
+                response = await client.post(self._config.url.rstrip("/") + "/settle", headers=headers,
+                                             json=request.model_dump(mode="json"), timeout=timeout)
                 if response.status_code not in range(200, 300):
                     raise Exception()
                 obj = SettleResponse(**(response.json()))
