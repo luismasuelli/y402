@@ -1,5 +1,7 @@
 from .base import FacilitatorClient as BaseFacilitatorClient
 from y402.core.types.errors import ConditionalDependencyError
+from .errors import VerifyFacilitatorInvalidError, VerifyFacilitatorUnknownError, SettleFacilitatorUnknownError, \
+    SettleFacilitatorFailedError
 from ..core.types.facilitator import VerifyRequest, VerifyResponse, SettleResponse, SettleRequest
 
 
@@ -16,8 +18,56 @@ class FacilitatorClient(BaseFacilitatorClient):
     However, this implementation is synchronous.
     """
 
-    def verify(self, request: VerifyRequest) -> VerifyResponse:
-        raise NotImplementedError
+    def verify(self, request: VerifyRequest, timeout: int = 10) -> VerifyResponse:
+        """
+        Performs a /verify POST call with the given data.
 
-    def settle(self, request: SettleRequest) -> SettleResponse:
-        raise NotImplementedError
+        Args:
+            request: The current request.
+            timeout: The timeout.
+        Returns:
+            The verify response.
+        """
+
+        headers = self._make_headers('verify')
+        if timeout < 1:
+            timeout = 1
+        try:
+            with httpx.Client(timeout=15) as client:
+                response = client.post(self._config.url.rstrip("/") + "/settle", headers=headers,
+                                       json=request.model_dump(mode="json"), timeout=timeout)
+                if response.status_code not in range(200, 300):
+                    raise Exception()
+                obj = VerifyResponse(**(response.json()))
+                if obj.is_valid:
+                    raise VerifyFacilitatorInvalidError(response.status_code, obj)
+                return obj
+        except Exception as e:
+            raise VerifyFacilitatorUnknownError(e)
+
+    def settle(self, request: SettleRequest, timeout: int = 10) -> SettleResponse:
+        """
+        Performs a /settle POST call with the given data.
+
+        Args:
+            request: The current request.
+            timeout: The timeout.
+        Returns:
+            The settle response.
+        """
+
+        headers = self._make_headers('settle')
+        if timeout < 1:
+            timeout = 1
+        try:
+            with httpx.Client(timeout=15) as client:
+                response = client.post(self._config.url.rstrip("/") + "/settle", headers=headers,
+                                       json=request.model_dump(mode="json"), timeout=timeout)
+                if response.status_code not in range(200, 300):
+                    raise Exception()
+                obj = SettleResponse(**(response.json()))
+                if obj.success:
+                    raise SettleFacilitatorFailedError(response.status_code, obj)
+                return obj
+        except Exception as e:
+            raise SettleFacilitatorUnknownError(e)
