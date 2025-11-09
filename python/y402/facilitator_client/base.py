@@ -25,8 +25,28 @@ class FacilitatorClient:
 
         return make_headers(self._config.headers, endpoint)
 
-    def verify(self, request: VerifyRequest) -> VerifyResponse:
+    def verify(self, request: VerifyRequest, timeout: int = 10) -> VerifyResponse:
+        """
+        Performs a /verify POST call with the given data.
+
+        Args:
+            request: The current request.
+            timeout: The timeout.
+        Returns:
+            The verify response.
+        """
+
         raise NotImplementedError
 
-    def settle(self, request: SettleRequest) -> SettleResponse:
+    def settle(self, request: SettleRequest, timeout: int = 10) -> SettleResponse:
+        """
+        Performs a /settle POST call with the given data.
+
+        Args:
+            request: The current request.
+            timeout: The timeout.
+        Returns:
+            The settle response.
+        """
+
         raise NotImplementedError
