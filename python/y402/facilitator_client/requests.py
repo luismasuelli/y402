@@ -1,6 +1,6 @@
 from .base import FacilitatorClient as BaseFacilitatorClient
-from y402.core.types.errors import ConditionalDependencyError
-from .errors import VerifyFacilitatorUnknownError, VerifyFacilitatorInvalidError, SettleFacilitatorUnknownError
+from y402.core.types.errors import ConditionalDependencyError, BaseError
+from .errors import VerifyFacilitatorUnknownError, SettleFacilitatorUnknownError
 from ..core.types.facilitator import VerifyRequest, VerifyResponse, SettleResponse, SettleRequest
 
 
@@ -37,6 +37,8 @@ class FacilitatorClient(BaseFacilitatorClient):
                                      timeout=timeout)
             self._check_verify_status(response.status_code, response.content, response.headers.get('Content-Type'))
             return self._parse_verify_obj(response.json())
+        except BaseError:
+            raise
         except Exception as e:
             raise VerifyFacilitatorUnknownError(e)
 
@@ -61,5 +63,7 @@ class FacilitatorClient(BaseFacilitatorClient):
                                      timeout=timeout)
             self._check_settle_status(response.status_code, response.content, response.headers.get('Content-Type'))
             return self._parse_settle_obj(response.json())
+        except BaseError:
+            raise
         except Exception as e:
             raise SettleFacilitatorUnknownError(e)
