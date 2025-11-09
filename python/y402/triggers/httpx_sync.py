@@ -11,8 +11,8 @@ except ImportError:
                                      "by invoking httpx==0.28.1 or similar")
 
 
-async def send_payment(webhook_url: str, settled_payment: SettledPayment,
-                       api_key: Optional[str] = None, timeout: int = 15):
+def send_payment(webhook_url: str, settled_payment: SettledPayment,
+                 api_key: Optional[str] = None, timeout: int = 15):
     """
     Sends a settled payment, using the `httpx` library.
 
@@ -33,9 +33,9 @@ async def send_payment(webhook_url: str, settled_payment: SettledPayment,
         timeout = 1
 
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
-            response = await client.post(webhook_url, headers=headers, json=settled_payment.model_dump(mode="json"),
-                                         timeout=timeout)
+        with httpx.Client(timeout=15) as client:
+            response = client.post(webhook_url, headers=headers, json=settled_payment.model_dump(mode="json"),
+                                   timeout=timeout)
             if response.status_code not in range(200, 300):
                 raise UnsuccessfulWebhookTrigger(response.status_code, response.content, response.headers)
     except Exception as e:
