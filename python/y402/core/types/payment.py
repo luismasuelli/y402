@@ -74,3 +74,6 @@ class SettledPayment(BaseModel):
     settled_on: datetime = Field(
         description="The time this payment was settled on"
     )
+    transaction_hash: str = Field(
+        description="The 0x-prefixed transaction hash"
+    )
