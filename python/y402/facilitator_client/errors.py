@@ -7,6 +7,12 @@ class HeadersBuildingFacilitatorError(BaseError):
     """
 
 
+class VerifyBadResponse(BaseError):
+    """
+    Raised when the verification returned a non-2xx error.
+    """
+
+
 class VerifyFacilitatorInvalidError(BaseError):
     """
     Raised when the verification failed (i.e. it's invalid).
@@ -16,6 +22,12 @@ class VerifyFacilitatorInvalidError(BaseError):
 class VerifyFacilitatorUnknownError(BaseError):
     """
     Raised when the verification had an error.
+    """
+
+
+class SettleBadResponse(BaseError):
+    """
+    Raised when the settling returned a non-2xx error.
     """
 
 
