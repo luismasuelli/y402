@@ -1,5 +1,5 @@
 from .base import FacilitatorClient as BaseFacilitatorClient
-from y402.core.types.errors import ConditionalDependencyError
+from y402.core.types.errors import ConditionalDependencyError, BaseError
 from .errors import VerifyFacilitatorInvalidError, VerifyFacilitatorUnknownError, SettleFacilitatorUnknownError, \
     SettleFacilitatorFailedError
 from ..core.types.facilitator import VerifyRequest, VerifyResponse, SettleResponse, SettleRequest
@@ -36,12 +36,11 @@ class FacilitatorClient(BaseFacilitatorClient):
             async with httpx.AsyncClient(timeout=15) as client:
                 response = await client.post(self._config.url.rstrip("/") + "/settle", headers=headers,
                                              json=request.model_dump(mode="json"), timeout=timeout)
-                if response.status_code not in range(200, 300):
-                    raise Exception()
-                obj = VerifyResponse(**(response.json()))
-                if obj.is_valid:
-                    raise VerifyFacilitatorInvalidError(response.status_code, obj)
-                return obj
+                response.read()
+                self._check_verify_status(response.status_code, response.content, response.headers.get('Content-Type'))
+                return self._parse_verify_obj(response.json())
+        except BaseError:
+            raise
         except Exception as e:
             raise VerifyFacilitatorUnknownError(e)
 
@@ -63,11 +62,10 @@ class FacilitatorClient(BaseFacilitatorClient):
             async with httpx.AsyncClient(timeout=15) as client:
                 response = await client.post(self._config.url.rstrip("/") + "/settle", headers=headers,
                                              json=request.model_dump(mode="json"), timeout=timeout)
-                if response.status_code not in range(200, 300):
-                    raise Exception()
-                obj = SettleResponse(**(response.json()))
-                if obj.success:
-                    raise SettleFacilitatorFailedError(response.status_code, obj)
-                return obj
+                response.read()
+                self._check_settle_status(response.status_code, response.content, response.headers.get('Content-Type'))
+                return self._parse_settle_obj(response.json())
+        except BaseError:
+            raise
         except Exception as e:
             raise SettleFacilitatorUnknownError(e)
