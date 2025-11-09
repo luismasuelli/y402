@@ -3,11 +3,13 @@ from y402.core.types.errors import ConditionalDependencyError
 from y402.core.types.payment import SettledPayment
 from y402.triggers.errors import UnsuccessfulWebhookTrigger, ExceptionOnWebhookTrigger
 
+
 try:
     import requests
 except ImportError:
     raise ConditionalDependencyError("Requests library is not installed. Install it as a requirement "
                                      "by invoking requests==2.32.5 or similar")
+
 
 def send_payment(webhook_url: str, settled_payment: SettledPayment,
                  api_key: Optional[str] = None, timeout: int = 15):
