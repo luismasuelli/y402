@@ -1,5 +1,6 @@
 from .base import FacilitatorClient as BaseFacilitatorClient
 from y402.core.types.errors import ConditionalDependencyError
+from .errors import VerifyFacilitatorUnknownError, VerifyFacilitatorInvalidError, SettleFacilitatorUnknownError
 from ..core.types.facilitator import VerifyRequest, VerifyResponse, SettleResponse, SettleRequest
 
 
@@ -15,8 +16,50 @@ class FacilitatorClient(BaseFacilitatorClient):
     This class stands for a requests-based facilitator client.
     """
 
-    def verify(self, request: VerifyRequest) -> VerifyResponse:
-        raise NotImplementedError
+    def verify(self, request: VerifyRequest, timeout: int = 10) -> VerifyResponse:
+        """
+        Performs a /verify POST call with the given data.
 
-    def settle(self, request: SettleRequest) -> SettleResponse:
-        raise NotImplementedError
+        Args:
+            request: The current request.
+            timeout: The timeout.
+        Returns:
+            The verify response.
+        """
+
+        headers = self._make_headers('verify')
+        if timeout < 1:
+            timeout = 1
+
+        try:
+            response = requests.post(self._config.url.rstrip("/") + "/verify",
+                                     headers=headers, json=request.model_dump(mode="json"),
+                                     timeout=timeout)
+            self._check_verify_status(response.status_code, response.content, response.headers.get('Content-Type'))
+            return self._parse_verify_obj(response.json())
+        except Exception as e:
+            raise VerifyFacilitatorUnknownError(e)
+
+    def settle(self, request: SettleRequest, timeout: int = 10) -> SettleResponse:
+        """
+        Performs a /settle POST call with the given data.
+
+        Args:
+            request: The current request.
+            timeout: The timeout.
+        Returns:
+            The settle response.
+        """
+
+        headers = self._make_headers('settle')
+        if timeout < 1:
+            timeout = 1
+
+        try:
+            response = requests.post(self._config.url.rstrip("/") + "/settle",
+                                     headers=headers, json=request.model_dump(mode="json"),
+                                     timeout=timeout)
+            self._check_settle_status(response.status_code, response.content, response.headers.get('Content-Type'))
+            return self._parse_settle_obj(response.json())
+        except Exception as e:
+            raise SettleFacilitatorUnknownError(e)

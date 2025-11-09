@@ -34,7 +34,7 @@ class FacilitatorClient(BaseFacilitatorClient):
             timeout = 1
         try:
             with httpx.Client(timeout=15) as client:
-                response = client.post(self._config.url.rstrip("/") + "/settle", headers=headers,
+                response = client.post(self._config.url.rstrip("/") + "/verify", headers=headers,
                                        json=request.model_dump(mode="json"), timeout=timeout)
                 response.read()
                 self._check_verify_status(response.status_code, response.content, response.headers.get('Content-Type'))
