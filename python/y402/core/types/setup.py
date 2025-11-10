@@ -4,119 +4,131 @@ from y402.core.types.errors import MisconfigurationError
 KNOWN_DATA = {
     "base": {
         "chain_id": 8453,
-        "tokens": [{
-            "code": "usdc",
-            "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-            "name": "USD Coin",
-            "decimals": 6,
-            "eip712Version": "2",
-            "symbol": "$"
-        }, {
-            "code": "eurc",
-            "address": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
-            "name": "EUR Coin",
-            "decimals": 6,
-            "eip712Version": "2",
-            "symbol": "€"
-        }]
+        "tokens": {
+            "usdc": {
+                "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "name": "USD Coin",
+                "decimals": 6,
+                "eip712Version": "2",
+                "symbol": "$"
+            },
+            "eurc": {
+                "address": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
+                "name": "EUR Coin",
+                "decimals": 6,
+                "eip712Version": "2",
+                "symbol": "€"
+            }
+        }
     },
     "base-sepolia": {
         "chain_id": 84532,
-        "tokens": [{
-            "code": "usdc",
-            "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-            "name": "USD Coin",
-            "decimals": 6,
-            "eip712Version": "2",
-            "symbol": "$"
-        }, {
-            "code": "eurc",
-            "address": "0x808456652fdb597867f38412077A9182bf77359F",
-            "name": "EUR Coin",
-            "decimals": 6,
-            "eip712Version": "2",
-            "symbol": "€"
-        }]
+        "tokens": {
+            "usdc": {
+                "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+                "name": "USD Coin",
+                "decimals": 6,
+                "eip712Version": "2",
+                "symbol": "$"
+            },
+            "eurc": {
+                "address": "0x808456652fdb597867f38412077A9182bf77359F",
+                "name": "EUR Coin",
+                "decimals": 6,
+                "eip712Version": "2",
+                "symbol": "€"
+            }
+        }
     },
     "avalanche": {
         "chain_id": 43114,
-        "tokens": [{
-            "code": "usdc",
-            "address": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
-            "name": "USD Coin",
-            "decimals": 6,
-            "eip712Version": "2",
-            "symbol": "$"
-        }, {
-            "code": "eurc",
-            "address": "0xc891eb4cbdeff6e073e859e987815ed1505c2acd",
-            "name": "EUR Coin",
-            "decimals": 6,
-            "eip712Version": "2",
-            "symbol": "€"
-        }]
+        "tokens": {
+            "usdc": {
+                "address": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+                "name": "USD Coin",
+                "decimals": 6,
+                "eip712Version": "2",
+                "symbol": "$"
+            },
+            "eurc": {
+                "address": "0xc891eb4cbdeff6e073e859e987815ed1505c2acd",
+                "name": "EUR Coin",
+                "decimals": 6,
+                "eip712Version": "2",
+                "symbol": "€"
+            }
+        }
     },
     "avalanche-fuji": {
         "chain_id": 43113,
-        "tokens": [{
-            "code": "usdc",
-            "address": "0x5425890298aed601595a70AB815c96711a31Bc65",
-            "name": "USD Coin",
-            "decimals": 6,
-            "eip712Version": "2",
-            "symbol": "$"
-        }, {
-            "code": "eurc",
-            "address": "0x5E44db7996c682E92a960b65AC713a54AD815c6B",
-            "name": "EUR Coin",
-            "decimals": 6,
-            "eip712Version": "2",
-            "symbol": "€"
-        }]
+        "tokens": {
+            "usdc": {
+                "address": "0x5425890298aed601595a70AB815c96711a31Bc65",
+                "name": "USD Coin",
+                "decimals": 6,
+                "eip712Version": "2",
+                "symbol": "$"
+            },
+            "eurc": {
+                "address": "0x5E44db7996c682E92a960b65AC713a54AD815c6B",
+                "name": "EUR Coin",
+                "decimals": 6,
+                "eip712Version": "2",
+                "symbol": "€"
+            }
+        }
     },
     "sei": {
         "chain_id": 1329,
-        "tokens": [{
-            "code": "usdc",
-            "address": "0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392",
-            "name": "USD Coin",
-            "decimals": 6,
-            "eip712Version": "2",
-            "symbol": "$"
-        }]
+        "tokens": {
+            "usdc": {
+                "code": "usdc",
+                "address": "0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392",
+                "name": "USD Coin",
+                "decimals": 6,
+                "eip712Version": "2",
+                "symbol": "$"
+            }
+        }
     },
     "sei-testnet": {
         "chain_id": 1328,
-        "tokens": [{
-            "code": "usdc",
-            "address": "0x4fCF1784B31630811181f670Aea7A7bEF803eaED",
-            "name": "USD Coin",
-            "decimals": 6,
-            "eip712Version": "2",
-            "symbol": "$"
-        }]
+        "tokens": {
+            "usdc": {
+                "code": "usdc",
+                "address": "0x4fCF1784B31630811181f670Aea7A7bEF803eaED",
+                "name": "USD Coin",
+                "decimals": 6,
+                "eip712Version": "2",
+                "symbol": "$"
+            }
+        }
     },
     "polygon": {
         "chain_id": 137,
-        "tokens": [{
-            "code": "usdc",
-            "address": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
-            "name": "USD Coin",
-            "decimals": 6,
-            "eip712Version": "2",
-            "symbol": "$"
-        }]
+        "tokens": {
+            "usdc": {
+                "code": "usdc",
+                "address": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+                "name": "USD Coin",
+                "decimals": 6,
+                "eip712Version": "2",
+                "symbol": "$"
+            }
+        }
     },
     "polygon-amoy": {
         "chain_id": 80002,
-        "tokens": [{
-            "code": "usdc",
-            "address": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
-            "name": "USD Coin",
-            "decimals": 6,
-            "eip712Version": "2",
-            "symbol": "$"
-        }]
+        "tokens": {
+            "usdc": {
+                "code": "usdc",
+                "address": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
+                "name": "USD Coin",
+                "decimals": 6,
+                "eip712Version": "2",
+                "symbol": "$"
+            }
+        }
     }
 }
 
@@ -131,6 +143,7 @@ class Y402Setup:
 
     def __init__(self):
         self._networks = {}
+        self._default_tokens = {}
 
     def add_network(self, network: str, chain_id: int = 0):
         """
@@ -164,7 +177,7 @@ class Y402Setup:
                   # The address and the version.
                   address: str = "", version: str = "",
                   # The decimals and the symbol.
-                  decimals: int = 6, symbol: str = "",
+                  decimals: int = 0, symbol: str = "",
                   # Whether it's default or not.
                   default_for_symbol: bool = False):
         """
@@ -174,7 +187,8 @@ class Y402Setup:
             network: The network name for which the token will be added.
             code: An internal name for this contract, like "usdc". Given
                   an existing network and a known code, adding it will
-                  just use the names of the known data.
+                  just use the names of the known data, optionally with
+                  some overrides (e.g. the version).
             name: A name for this contract. It may be chosen, e.g. "USDC".
             address: The address of the token.
             version: The EIP-712 version of the token. If the token is
@@ -199,6 +213,46 @@ class Y402Setup:
         if code in self._networks[network]["tokens"]:
             raise MisconfigurationError(f"This token is already set up in network {network}: {code}")
 
+        if code in KNOWN_DATA[network]["tokens"]:
+            known_token = KNOWN_DATA[network]["tokens"][code]
+            decimals = decimals or known_token["decimals"]
+            version = version or known_token["eip712Version"]
+            symbol = symbol or known_token["symbol"]
+            address = address or known_token["address"]
+            name = name or known_token["name"]
+
         name = name.strip() or code.upper()
-        if not address or not version:
-            pass
+        if not address or not version or decimals < 0 or not name:
+            raise MisconfigurationError(f"One or more token arguments are missing")
+
+        self._networks[network]["tokens"][code] = {
+            "name": name, "symbol": symbol, "address": address,
+            "version": version, "decimals": decimals
+        }
+        if default_for_symbol:
+            self._default_tokens.setdefault(network, {})[symbol] = code
+
+    def set_default_for_symbol_token(self, network: str, code: str):
+        """
+        Given a network code and a token code, it ensures the token
+        becomes the default one for its symbol (even if for some
+        reason no symbol were to be defined in a token).
+
+        Args:
+            network: The network name for which the token will be added.
+            code: An internal name for an existing token contract in the
+                  network in this setup.
+        """
+
+        network = network.strip().lower()
+        code = code.strip().lower()
+        if network not in self._networks:
+            raise MisconfigurationError(f"This network is not yet set up: {network}")
+        if not code:
+            raise MisconfigurationError(f"Use a valid code for the token")
+        if code not in self._networks[network]["tokens"]:
+            raise MisconfigurationError(f"This token is not yet set up in network {network}: {code}")
+
+        token = self._networks[network]["tokens"][code]
+        symbol = token["symbol"]
+        self._default_tokens[network][symbol] = code
