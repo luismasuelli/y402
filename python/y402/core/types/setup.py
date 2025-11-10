@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from y402.core.types.errors import MisconfigurationError
 
 
@@ -168,7 +170,8 @@ class Y402Setup:
             raise MisconfigurationError(f"Invalid chain id for network key: {network}")
         self._networks[network] = {
             "chain_id": chain_id,
-            "tokens": {}
+            "tokens": {},
+            "tokens_by_address": {}
         }
 
     def add_token(self, network: str, code: str,
@@ -212,6 +215,8 @@ class Y402Setup:
             raise MisconfigurationError(f"Use a valid code for the token")
         if code in self._networks[network]["tokens"]:
             raise MisconfigurationError(f"This token is already set up in network {network}: {code}")
+        if symbol in " 0123456789." or len(symbol) > 1:
+            raise MisconfigurationError(f"Invalidd symbol: {symbol}")
 
         if code in KNOWN_DATA[network]["tokens"]:
             known_token = KNOWN_DATA[network]["tokens"][code]
@@ -224,11 +229,14 @@ class Y402Setup:
         name = name.strip() or code.upper()
         if not address or not version or decimals < 0 or not name:
             raise MisconfigurationError(f"One or more token arguments are missing")
+        if address in self._networks[network]["tokens_by_address"]:
+            raise MisconfigurationError(f"This token's address is already setup in network {network}: {address}")
 
         self._networks[network]["tokens"][code] = {
             "name": name, "symbol": symbol, "address": address,
             "version": version, "decimals": decimals
         }
+        self._networks[network]["tokens_by_address"][address] = code
         if default_for_symbol:
             self._default_tokens.setdefault(network, {})[symbol] = code
 
@@ -256,3 +264,82 @@ class Y402Setup:
         token = self._networks[network]["tokens"][code]
         symbol = token["symbol"]
         self._default_tokens[network][symbol] = code
+
+    def _get_price_label(self, value: str, decimals: int, symbol: str):
+        """
+        Builds a price label for an amount of a given currency.
+
+        Args:
+            value: A decimal representation of the amount.
+            decimals: The amount of digits that are decimal places.
+            symbol: The currency symbol.
+        Returns:
+            A textual representation.
+        """
+
+        d = Decimal(value) / (10 ** decimals)
+        return f"{symbol}{d}"
+
+    def get_token_data(self, network: str, token: str, value: str) -> tuple[int, str, str, str]:
+        """
+        Returns data associated to a specific token payment.
+
+        Args:
+            network: The name of the network.
+            token: The address of the token contract.
+            value: A decimal representation of the amount.
+        Returns:
+            A tuple (chain_id, code, name, price_label).
+        """
+
+        network = network.strip().lower()
+        if network not in self._networks:
+            raise MisconfigurationError(f"This network is not yet set up: {network}")
+        if token not in self._networks[network]["tokens_by_address"]:
+            raise MisconfigurationError(f"Use a valid code for the token")
+        code = self._networks[network]["tokens_by_address"][token]
+        token_data = self._networks[network]["tokens"]
+        decimals = token_data["decimals"]
+        name = token_data["name"]
+        chain_id = self._networks[network]["chain_id"]
+        symbol = token_data["symbol"]
+        return chain_id, code, name, self._get_price_label(value, decimals, symbol)
+
+    def parse_price_label(self, network: str, label: str) -> tuple[str, str]:
+        """
+        Given a price label, it tries to parse it.
+
+        Args:
+            network: The name of the network.
+            label: The label to parse.
+        Returns:
+            The parsed token price, as (asset address, amount).
+        """
+
+        label = label.strip()
+        if not label:
+            return "", "0"
+
+        # 1. Parse the symbol and get the token.
+        if label[0] not in "0123456789.":
+            symbol, price = label[0], label[1:]
+        else:
+            symbol, price = "", label
+        if symbol not in self._default_tokens[network]:
+            raise MisconfigurationError(f"The symbol '{symbol}' is not default-registered in network: {network}")
+        code = self._default_tokens[network][symbol]
+        token_data = self._networks[network]["tokens"][code]
+        token = token_data["address"]
+        decimals = token_data["decimals"]
+
+        # 2. Parse the price and multiply by decimals to get the amount.
+        try:
+            d = Decimal(price)
+            if d < 0:
+                raise ValueError("Invalid Price")
+            amount = str(int(d * 10 ** decimals))
+        except:
+            raise MisconfigurationError(f"The price '{price} is not a valid amount")
+
+        # 3. Return both.
+        return token, amount
