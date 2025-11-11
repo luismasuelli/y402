@@ -5,9 +5,9 @@ from y402.core.types.facilitator import VerifyRequest, X402_VERSION, Facilitator
 from y402.core.types.requirements import PaymentRequirements
 from y402.core.types.setup import Y402Setup
 from y402.core.types.storage import StorageManager
-from y402.facilitator_client.httpx import FacilitatorClient
+from y402.facilitator_client.httpx_sync import FacilitatorClient
 from y402.lifecycle.utils import create_settled_payment
-from y402.triggers.httpx import send_payment
+from y402.triggers.httpx_sync import send_payment
 
 
 async def process_payment(
@@ -44,7 +44,7 @@ async def process_payment(
     facilitator_client = FacilitatorClient(facilitator_config)
 
     # 2. Perform the verification.
-    await facilitator_client.verify(VerifyRequest(
+    facilitator_client.verify(VerifyRequest(
         x402_version=X402_VERSION,
         payment_payload=payment,
         payment_requirements=matched_requirements,
@@ -53,17 +53,17 @@ async def process_payment(
 
     # 3. Store the verified payment.
     payment_id = uuid4()
-    await storage_manager.allocate(payment_id, payment, matched_requirements)
+    storage_manager.allocate(payment_id, payment, matched_requirements)
 
     # 4. Settle the payment.
     try:
-        await facilitator_client.settle(SettleRequest(
+        facilitator_client.settle(SettleRequest(
             x402_version=X402_VERSION,
             payment_payload=payment,
             payment_requirements=matched_requirements,
             timeout=request_timeout
         ))
-        await storage_manager.commit(payment_id)
+        storage_manager.commit(payment_id)
         payer = payment.payload.authorization.from_
         network = payment.network
         token = matched_requirements.asset
@@ -74,7 +74,7 @@ async def process_payment(
             payer, chain_id, token, value,
             code, name, price_label
         )
-        await send_payment(webhook_url, settled_payment, api_key, webhook_timeout)
+        send_payment(webhook_url, settled_payment, api_key, webhook_timeout)
     except:
-        await storage_manager.rollback(payment_id)
+        storage_manager.rollback(payment_id)
         raise
