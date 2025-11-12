@@ -1,10 +1,12 @@
-from flask import request
+from flask import request, current_app
 
 
 def get_root_url() -> str:
     """
     Retrieves the root URL (i.e. no path nor trailing slash).
-    :return: The base proto://host url.
+
+    Returns:
+        The base proto://host url.
     """
 
     # This uses forwarded headers if present (e.g. behind reverse proxy).
@@ -20,3 +22,21 @@ def get_root_url() -> str:
 
     # Construct root URL without path/query.
     return f"{scheme}://{host}"
+
+
+def resolve_endpoint():
+    """
+    Obtains the endpoint (function) being responsible for
+    the handing of the current request.
+
+    Returns:
+        The endpoint handling it.
+    """
+
+    # `request.endpoint` gives the endpoint name (usually the function name)
+    endpoint_name = request.endpoint
+    if endpoint_name is None:
+        return None
+
+    # `current_app.view_functions` maps endpoint names to the actual callables
+    return current_app.view_functions.get(endpoint_name)
