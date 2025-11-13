@@ -1,8 +1,8 @@
-from fastapi import Request
 from typing import List, Callable, Awaitable
+from fastapi import Request
+from pydantic import Field
 from ...core.types.endpoint_settings import X402EndpointSettings as BaseX402EndpointSettings
 from ...core.types.requirements import RequirePaymentDetails
-from pydantic import Field
 
 
 X402_ENDPOINT_SETTINGS = "x402_endpoint_settings"
