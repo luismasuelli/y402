@@ -5,7 +5,7 @@ from ...core.types.endpoint_settings import X402EndpointSettings as BaseX402Endp
 from ...core.types.requirements import RequirePaymentDetails
 
 
-X402_ENDPOINT_SETTINGS = "x402_endpoint_settings"
+Y402_ENDPOINT_SETTINGS = "y402_endpoint_settings"
 
 
 PaymentDetailsListType = List[RequirePaymentDetails] | \
@@ -25,5 +25,5 @@ class X402EndpointSettings(BaseX402EndpointSettings):
     )
 
     def __call__(self, endpoint):
-        setattr(endpoint, X402_ENDPOINT_SETTINGS, self)
+        setattr(endpoint, Y402_ENDPOINT_SETTINGS, self)
         return endpoint
