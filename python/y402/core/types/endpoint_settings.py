@@ -2,6 +2,7 @@ from typing import Optional, Any
 from pydantic import BaseModel, Field
 from .paywall import PaywallConfig
 from .schema import HTTPInputSchema
+from .setup import Y402Setup
 
 
 X402_ENDPOINT_SETTINGS = "x402_endpoint_settings"
@@ -41,6 +42,12 @@ class X402EndpointSettings(BaseModel):
     )
     custom_paywall_html: Optional[str] = Field(
         default=None, description="An optional HTML Paywall template for this endpoint in particular "
+    )
+    custom_setup: Optional[Y402Setup] = Field(
+        default=None, description="A custom setup (i.e. to set more networks and more tokens) "
+                                  "applying for this endpoint only. It will merge to the setup "
+                                  "in the middleware (only for this endpoint) to generate the "
+                                  "final layout of supported networks and tokens"
     )
 
     def __call__(self, endpoint):
