@@ -1,5 +1,4 @@
 from decimal import Decimal
-
 from y402.core.types.errors import MisconfigurationError
 
 
