@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Optional, Any, Union
 import re
 from pydantic import BaseModel, Field, ConfigDict, field_validator
 from pydantic.alias_generators import to_camel
@@ -32,6 +32,9 @@ class TokenAmount(BaseModel):
         except ValueError:
             raise ValueError("amount must be an integer encoded as a string")
         return v
+
+
+Price = Union[str, int, TokenAmount]
 
 
 class RequirePaymentDetails(BaseModel):
