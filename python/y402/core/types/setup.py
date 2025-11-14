@@ -342,3 +342,46 @@ class Y402Setup:
 
         # 3. Return both.
         return token, amount
+
+    def __or__(self, other: 'Y402Setup'):
+        """
+        Merges two definitions (as a new definition) when doing this. The
+        definitions in the first operand take precedence when defining
+        networks and tokens, but the definitions in the second operand
+        take precedence when defining defaults.
+        :param other: The other setup to merge.
+        :return: The new, merged, definition.
+        """
+
+        if not isinstance(other, Y402Setup):
+            raise TypeError(f"Can only merge Y402Setup (not \"{type(other).__name__}\") to Y402Setup")
+
+        merged = Y402Setup()
+        for obj in [self, other]:
+            for network, values in obj._networks.items():
+                # First, add the network.
+                chain_id = values["chain_id"]
+                tokens = values["tokens"]
+                try:
+                    merged.add_network(network, chain_id)
+                except:
+                    pass
+
+                # Then, add the tokens.
+                for code, token_data in tokens.items():
+                    name = token_data["name"]
+                    symbol = token_data["symbol"]
+                    address = token_data["address"]
+                    version = token_data["version"]
+                    decimals = token_data["decimals"]
+                    try:
+                        obj.add_token(network, code, name, address, version, decimals, symbol)
+                    except:
+                        pass
+
+                # Finally, add the defaults. The defaults
+                # in the other setup will take precedence.
+                for symbol, code in obj._default_tokens.get(network, {}):
+                    merged.set_default_for_symbol_token(network, code)
+
+        return merged
