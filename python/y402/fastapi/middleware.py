@@ -1,6 +1,7 @@
 from typing import Callable, Optional, List, Literal
 import logging
 from fastapi import Request, HTTPException
+from pydantic import validate_call
 from .prices import compute_prices
 from .request_data import resolve_endpoint, get_root_url
 from .response_presets import x402_response
@@ -10,7 +11,7 @@ from ..core.types.paywall import PaywallConfig
 from ..core.types.registry import FinalEndpointSetupRegistry
 from ..core.types.requirements import FinalRequiredPaymentDetails, PaymentRequirements
 from ..core.types.setup import Y402Setup
-from ..core.utils.headers import decode_payment_header
+from ..core.utils.headers import decode_payment_header, validate_payment_asset
 from ..core.utils.prices import PriceComputingError
 
 
@@ -18,6 +19,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
+@validate_call
 def payment_required(
     mime_type: str = "",
     default_max_deadline_seconds: int = 60,
@@ -149,11 +151,48 @@ def payment_required(
             return x402_response(request, "Invalid payment header format", custom_paywall_html_,
                                  paywall_config_, payment_requirements)
 
-        # 7. Extract the extra header, perhaps, with payment token.
-        payment_asset_header = request.headers.get("X-PAYMENT-ASSET", "")
+        # 7. Extract the extra header, perhaps, with payment token. It
+        #    must be an address, if present.
+        payment_asset_header = request.headers.get("X-PAYMENT-ASSET", "").lower()
 
         # 8. Based on the payment_token_header, if available, select
         #    which token was selected. Otherwise, iterate until a
         #    token matches the signature.
+        network = payment.network
+        code, ok = validate_payment_asset(network, payment, payment_asset_header, merged_setup)
+        if not ok:
+            logger.exception(
+                f"Invalid payment header format from {request.client.host if request.client else 'unknown'}:"
+            )
+            return x402_response(request, "Invalid payment asset", custom_paywall_html_,
+                                 paywall_config_, payment_requirements)
+
+        # 9. Pick the proper payment by the code, and make use of it later.
+        requirement = next(
+            (requirement
+             for requirement in payment_requirements
+             if requirement.asset == payment_asset_header and requirement.network == network),
+            None
+        )
+        if not requirement:
+            return x402_response(request, "Invalid payment asset", custom_paywall_html_,
+                                 paywall_config_, payment_requirements)
+
+        match client_http_library:
+            case "httpx":
+                from ..lifecycle.httpx import process_payment
+            case _:
+                return x402_response(request, "Server not properly configured", custom_paywall_html_,
+                                     paywall_config_, payment_requirements)
+
+        try:
+            # TODO continue here: define these variables.
+            await process_payment(resource_url, tags, reference, payment,
+                                  requirement, merged_setup, facilitator_config,
+                                  storage_manager, webhook_url, api_key, request_timeout)
+            # TODO continue here: add a proper return value.
+        except:
+            # TODO continue here: capture all the exceptions properly.
+            pass
 
     return middleware
