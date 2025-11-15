@@ -148,3 +148,28 @@ class PaymentRequirements(BaseModel):
                 "max_amount_required must be an integer encoded as a string"
             )
         return v
+
+
+class FinalRequiredPaymentDetails(BaseModel):
+    """
+    This is a final payment requirement specification
+    that applies for an endpoint in particular.
+    """
+
+    scheme: str = Field(description="The scheme", default="exact")
+    network: str = Field(
+        description="The human name of the network (e.g. ethereum, ethereum-sepolia, "
+                    "base, base-sepolia, avalanche, avalanche-fuji)"
+    )
+    asset_address: str = Field(
+        description="The address of the token asset"
+    )
+    amount_required: str = Field(
+        description="The required amount, as an uint256 value"
+    )
+    pay_to_address: str = Field(
+        description="The address to pay to. It must be a valid address"
+    )
+    eip712_domain: dict = Field(
+        description="The data related to the eip712 domain for this protocol"
+    )
