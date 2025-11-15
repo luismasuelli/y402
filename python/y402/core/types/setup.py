@@ -304,6 +304,21 @@ class Y402Setup:
         symbol = token_data["symbol"]
         return chain_id, code, name, self._get_price_label(value, decimals, symbol)
 
+    def get_chain_id(self, network: str) -> int:
+        """
+        Given a network, returns its chain id.
+
+        Args:
+            network: The name of the network.
+        Returns:
+            An integer being the chain id.
+        """
+
+        try:
+            return self._networks[network]
+        except:
+            raise MisconfigurationError(f"This network is not set up: {network}")
+
     def parse_price_label(self, network: str, label: str) -> tuple[str, str]:
         """
         Given a price label, it tries to parse it.
