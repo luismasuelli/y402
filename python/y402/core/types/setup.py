@@ -321,6 +321,22 @@ class Y402Setup:
         d = Decimal(value) / (10 ** decimals)
         return f"{symbol}{d}"
 
+    def get_token_metadata(self, network: str, code: str) -> Tuple[str, str, str, str, int]:
+        """
+        Returns the metadata associated to a token.
+
+        Args:
+            network: The network name for which the token will be defaulted.
+            code: An internal name for an existing token contract in the
+                  network in this setup.
+        Returns:
+            The associated metadata.
+        """
+
+        network, code = self._check_network_and_code(network, code)
+        token = self._networks[network]["tokens"][code]
+        return token["name"], token["symbol"], token["address"], token["version"], token["decimals"]
+
     def get_payment_data(self, network: str, token: str, value: str) -> tuple[int, str, str, str]:
         """
         Returns data associated to a specific token payment.
