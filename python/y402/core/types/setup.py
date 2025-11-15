@@ -1,3 +1,4 @@
+from typing import Tuple, Optional
 from decimal import Decimal
 from y402.core.types.errors import MisconfigurationError
 
@@ -170,7 +171,8 @@ class Y402Setup:
         self._networks[network] = {
             "chain_id": chain_id,
             "tokens": {},
-            "tokens_by_address": {}
+            "tokens_by_address": {},
+            "default_token": None
         }
 
     def add_token(self, network: str, code: str,
@@ -239,11 +241,9 @@ class Y402Setup:
         if default_for_symbol:
             self._default_tokens.setdefault(network, {})[symbol] = code
 
-    def set_default_for_symbol_token(self, network: str, code: str):
+    def _check_network_and_code(self, network: str, code: str) -> Tuple[str, str]:
         """
-        Given a network code and a token code, it ensures the token
-        becomes the default one for its symbol (even if for some
-        reason no symbol were to be defined in a token).
+        Checks the chosen network and token code to exist.
 
         Args:
             network: The network name for which the token will be added.
@@ -260,9 +260,51 @@ class Y402Setup:
         if code not in self._networks[network]["tokens"]:
             raise MisconfigurationError(f"This token is not yet set up in network {network}: {code}")
 
+        return network, code
+
+    def set_default_for_symbol_token(self, network: str, code: str):
+        """
+        Given a network code and a token code, it ensures the token
+        becomes the default one for its symbol (even if for some
+        reason no symbol were to be defined in a token).
+
+        Args:
+            network: The network name for which the token will be added.
+            code: An internal name for an existing token contract in the
+                  network in this setup.
+        """
+
+        network, code = self._check_network_and_code(network, code)
         token = self._networks[network]["tokens"][code]
         symbol = token["symbol"]
         self._default_tokens[network][symbol] = code
+
+    def set_default_token(self, network: str, code: str):
+        """
+        Given a network code and a token code, it ensures the token
+        becomes the default one, this time not for its symbol but
+        instead for when an integer value is used.
+
+        Args:
+            network: The network name for which the token will be defaulted.
+            code: An internal name for an existing token contract in the
+                  network in this setup.
+        """
+
+        network, code = self._check_network_and_code(network, code)
+        self._networks[network]["default_token"] = code
+
+    def get_default_token(self, network: str) -> Optional[str]:
+        """
+        Gets the default token of a network
+
+        Args:
+            network: The network name for which the token will be defaulted.
+        Returns:
+            The default token code of that network.
+        """
+
+        return self._networks[network]["default_token"]
 
     def _get_price_label(self, value: str, decimals: int, symbol: str):
         """
