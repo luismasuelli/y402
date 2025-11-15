@@ -1,4 +1,4 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 from decimal import Decimal
 from y402.core.types.errors import MisconfigurationError
 
@@ -320,6 +320,21 @@ class Y402Setup:
 
         d = Decimal(value) / (10 ** decimals)
         return f"{symbol}{d}"
+
+    def list_tokens(self, network: str) -> List[str]:
+        """
+        Returns the list of registered token (codes) for a network.
+
+        Args:
+            network: The network name for which the tokens will be listed.
+        Returns:
+            The list of registered tokens.
+        """
+
+        network = network.strip().lower()
+        if network not in self._networks:
+            raise MisconfigurationError(f"This network is not yet set up: {network}")
+        return list(self._networks[network]["tokens"].keys())
 
     def get_token_metadata(self, network: str, code: str) -> Tuple[str, str, str, str, int]:
         """
