@@ -1,2 +1,3 @@
 pydantic==2.12.4
+eth-account==0.13.7
 # requests==2.32.5
