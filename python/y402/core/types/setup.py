@@ -321,7 +321,7 @@ class Y402Setup:
         d = Decimal(value) / (10 ** decimals)
         return f"{symbol}{d}"
 
-    def get_token_data(self, network: str, token: str, value: str) -> tuple[int, str, str, str]:
+    def get_payment_data(self, network: str, token: str, value: str) -> tuple[int, str, str, str]:
         """
         Returns data associated to a specific token payment.
 

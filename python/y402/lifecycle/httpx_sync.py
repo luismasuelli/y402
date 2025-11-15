@@ -68,7 +68,7 @@ async def process_payment(
         network = payment.network
         token = matched_requirements.asset
         value = payment.payload.authorization.value
-        chain_id, code, name, price_label = setup.get_token_data(network, token, value)
+        chain_id, code, name, price_label = setup.get_payment_data(network, token, value)
         settled_payment = create_settled_payment(
             payment_id, resource, tags, reference,
             payer, chain_id, token, value,
