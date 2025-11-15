@@ -16,7 +16,7 @@ KNOWN_DATA = {
             },
             "eurc": {
                 "address": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
-                "name": "EUR Coin",
+                "name": "EURC",
                 "decimals": 6,
                 "eip712Version": "2",
                 "symbol": "€"
@@ -28,14 +28,14 @@ KNOWN_DATA = {
         "tokens": {
             "usdc": {
                 "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-                "name": "USD Coin",
+                "name": "USDC",
                 "decimals": 6,
                 "eip712Version": "2",
                 "symbol": "$"
             },
             "eurc": {
                 "address": "0x808456652fdb597867f38412077A9182bf77359F",
-                "name": "EUR Coin",
+                "name": "EURC",
                 "decimals": 6,
                 "eip712Version": "2",
                 "symbol": "€"
@@ -54,7 +54,7 @@ KNOWN_DATA = {
             },
             "eurc": {
                 "address": "0xc891eb4cbdeff6e073e859e987815ed1505c2acd",
-                "name": "EUR Coin",
+                "name": "Euro Coin",
                 "decimals": 6,
                 "eip712Version": "2",
                 "symbol": "€"
@@ -86,7 +86,7 @@ KNOWN_DATA = {
             "usdc": {
                 "code": "usdc",
                 "address": "0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392",
-                "name": "USD Coin",
+                "name": "USDC",
                 "decimals": 6,
                 "eip712Version": "2",
                 "symbol": "$"
@@ -99,7 +99,7 @@ KNOWN_DATA = {
             "usdc": {
                 "code": "usdc",
                 "address": "0x4fCF1784B31630811181f670Aea7A7bEF803eaED",
-                "name": "USD Coin",
+                "name": "USDC",
                 "decimals": 6,
                 "eip712Version": "2",
                 "symbol": "$"
@@ -125,7 +125,7 @@ KNOWN_DATA = {
             "usdc": {
                 "code": "usdc",
                 "address": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
-                "name": "USD Coin",
+                "name": "USDC",
                 "decimals": 6,
                 "eip712Version": "2",
                 "symbol": "$"
