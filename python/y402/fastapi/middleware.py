@@ -4,13 +4,14 @@ from fastapi import Request, HTTPException
 from pydantic import validate_call
 from .prices import compute_prices
 from .request_data import resolve_endpoint, get_root_url
-from .response_presets import x402_response
+from .response_presets import x402_response, response
 from .types.endpoint_settings import X402EndpointSettings, Y402_ENDPOINT_SETTINGS
 from ..core.types.facilitator import FacilitatorConfig
 from ..core.types.paywall import PaywallConfig
 from ..core.types.registry import FinalEndpointSetupRegistry
 from ..core.types.requirements import FinalRequiredPaymentDetails, PaymentRequirements
 from ..core.types.setup import Y402Setup
+from ..core.types.storage import StorageManager
 from ..core.utils.headers import decode_payment_header, validate_payment_asset
 from ..core.utils.prices import PriceComputingError
 
@@ -21,13 +22,15 @@ logger.setLevel(logging.INFO)
 
 @validate_call
 def payment_required(
+    *,
     mime_type: str = "",
     default_max_deadline_seconds: int = 60,
     paywall_config: Optional[PaywallConfig] = None,
     custom_paywall_html: Optional[str] = None,
     facilitator_config: Optional[FacilitatorConfig] = None,
     setup: Optional[FinalEndpointSetupRegistry] = None,
-    client_http_library: Literal["httpx"] = "httpx"
+    client_http_library: Literal["httpx"] = "httpx",
+    storage_manager: Optional[StorageManager] = None
 ):
     """
     This factory creates a middleware that performs the
@@ -42,6 +45,9 @@ def payment_required(
         facilitator_config: The configuration for the facilitator.
         setup: The general, middleware-wide, setup.
         client_http_library: The allowed client library (to make new HTTP calls with).
+        storage_manager: The default storage manager. If not set, it must set on each of the endpoints
+                         configured to be Y402-defined. Storage managers are used to store the requested
+                         and paid-for jobs.
     Returns:
         A middleware function.
     """
@@ -77,6 +83,13 @@ def payment_required(
         mime_type_ = endpoint_data.mime_type or mime_type
         paywall_config_ = endpoint_data.paywall_config or paywall_config
         custom_paywall_html_ = endpoint_data.custom_paywall_html or custom_paywall_html
+        storage_manager_ = endpoint_data.storage_manager or storage_manager
+
+        if storage_manager_ is None:
+            raise response(
+                request, 500, f"The resource {resource_url} is not properly configured",
+                custom_paywall_html_, paywall_config_, []
+            )
 
         # 3. Given the per-endpoint configuration, get all the prices
         #    the user can pay. All of them will be *exact*, but can
@@ -96,14 +109,14 @@ def payment_required(
             raise
         except PriceComputingError as e:
             logger.exception("An error occurred at price computing stage:")
-            return x402_response(
-                request, f"The resource {resource_url}'s setup / pricing is not properly configured: {str(e)}",
+            return response(
+                request, 500, f"The resource {resource_url}'s setup / pricing is not properly configured: {str(e)}",
                 custom_paywall_html_, paywall_config_, []
             )
         except:
             logger.exception("An error occurred at price computing stage:")
-            return x402_response(
-                request, f"The resource {resource_url}'s setup / pricing is not properly configured",
+            return response(
+                request, 500, f"The resource {resource_url}'s setup / pricing is not properly configured",
                 custom_paywall_html_, paywall_config_, []
             )
 
@@ -187,9 +200,9 @@ def payment_required(
 
         try:
             # TODO continue here: define these variables.
-            await process_payment(resource_url, tags, reference, payment,
+            await process_payment(resource_url, endpoint_data.tags, reference, payment,
                                   requirement, merged_setup, facilitator_config,
-                                  storage_manager, webhook_url, api_key, request_timeout)
+                                  storage_manager_, webhook_url, api_key, request_timeout)
             # TODO continue here: add a proper return value.
         except:
             # TODO continue here: capture all the exceptions properly.

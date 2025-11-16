@@ -1,9 +1,9 @@
-from typing import Optional, Any
+from typing import Optional, Any, List
 from pydantic import BaseModel, Field
 from .paywall import PaywallConfig
 from .schema import HTTPInputSchema
 from .setup import Y402Setup
-
+from .storage import StorageManager
 
 X402_ENDPOINT_SETTINGS = "x402_endpoint_settings"
 
@@ -43,11 +43,19 @@ class X402EndpointSettings(BaseModel):
     custom_paywall_html: Optional[str] = Field(
         default=None, description="An optional HTML Paywall template for this endpoint in particular "
     )
+    storage_manager: Optional[StorageManager] = Field(
+        default=None, description="The storage manager. It is preferred over the middleware-level "
+                                  "storage manager, and it is mandatory if no storage manager is "
+                                  "defined at middleware level"
+    )
     custom_setup: Optional[Y402Setup] = Field(
         default=None, description="A custom setup (i.e. to set more networks and more tokens) "
                                   "applying for this endpoint only. It will merge to the setup "
                                   "in the middleware (only for this endpoint) to generate the "
                                   "final layout of supported networks and tokens"
+    )
+    tags: Optional[List[str]] = Field(
+        default=None, description="Arbitrary tags associated to this endpoint"
     )
 
     def __call__(self, endpoint):
