@@ -1,3 +1,5 @@
+import threading
+import uuid
 from typing import List
 from uuid import uuid4
 from y402.core.types.client import PaymentPayload
@@ -21,7 +23,7 @@ async def process_payment(
     webhook_url: str, api_key: str = None,
     # Tunings.
     request_timeout: int = 15, webhook_timeout: int = 15
-):
+) -> uuid.UUID:
     """
     Processes a given payment.
 
@@ -38,6 +40,8 @@ async def process_payment(
         api_key: The API key for the webhook. Optional.
         request_timeout: The timeout for requests.
         webhook_timeout: The timeout for the webhook.
+    Returns:
+        The processed UUID for this payment.
     """
 
     # 1. Create the facilitator config.
@@ -74,7 +78,8 @@ async def process_payment(
             payer, chain_id, token, value,
             code, name, price_label
         )
-        send_payment(webhook_url, settled_payment, api_key, webhook_timeout)
+        threading.Thread(target=lambda: send_payment(webhook_url, settled_payment, api_key, webhook_timeout)).start()
+        return payment_id
     except:
         storage_manager.rollback(payment_id)
         raise
