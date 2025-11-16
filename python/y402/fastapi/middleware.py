@@ -89,10 +89,22 @@ def payment_required(
         request_timeout_ = endpoint_data.request_timeout or request_timeout
 
         if storage_manager_ is None:
-            raise response(
+            logger.error(f"Storage manager not defined for resource {resource_url}")
+            return response(
                 request, 500, f"The resource {resource_url} is not properly configured",
                 custom_paywall_html_, paywall_config_, []
             )
+
+        reference = ''
+        if endpoint_data.reference_param is not None:
+            reference = request.path_params.get(endpoint_data.reference_param, None)
+            if reference is None:
+                logger.error(f"Path parameter '{endpoint_data.reference_param}' not defined for "
+                             f"resource {resource_url}")
+                return response(
+                    request, 500, f"The resource {resource_url} is not properly configured",
+                    custom_paywall_html_, paywall_config_, []
+                )
 
         # 3. Given the per-endpoint configuration, get all the prices
         #    the user can pay. All of them will be *exact*, but can
@@ -177,7 +189,7 @@ def payment_required(
         network = payment.network
         code, ok = validate_payment_asset(network, payment, payment_asset_header, merged_setup)
         if not ok:
-            logger.exception(
+            logger.error(
                 f"Invalid payment header format from {request.client.host if request.client else 'unknown'}:"
             )
             return x402_response(request, "Invalid payment asset", custom_paywall_html_,
@@ -202,13 +214,13 @@ def payment_required(
                                      paywall_config_, payment_requirements)
 
         try:
-            # TODO continue here: define these variables.
             await process_payment(resource_url, endpoint_data.tags, reference, payment, requirement,
                                   merged_setup, facilitator_config, storage_manager_,
                                   endpoint_data.webhook_url, endpoint_data.api_key, request_timeout_)
-            # TODO continue here: add a proper return value.
         except:
             # TODO continue here: capture all the exceptions properly.
             pass
+
+        return await call_next(request)
 
     return middleware
