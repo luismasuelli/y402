@@ -30,7 +30,8 @@ def payment_required(
     facilitator_config: Optional[FacilitatorConfig] = None,
     setup: Optional[FinalEndpointSetupRegistry] = None,
     client_http_library: Literal["httpx"] = "httpx",
-    storage_manager: Optional[StorageManager] = None
+    storage_manager: Optional[StorageManager] = None,
+    request_timeout: int = 60
 ):
     """
     This factory creates a middleware that performs the
@@ -48,6 +49,7 @@ def payment_required(
         storage_manager: The default storage manager. If not set, it must set on each of the endpoints
                          configured to be Y402-defined. Storage managers are used to store the requested
                          and paid-for jobs.
+        request_timeout: The timeout for the webhook requests.
     Returns:
         A middleware function.
     """
@@ -84,6 +86,7 @@ def payment_required(
         paywall_config_ = endpoint_data.paywall_config or paywall_config
         custom_paywall_html_ = endpoint_data.custom_paywall_html or custom_paywall_html
         storage_manager_ = endpoint_data.storage_manager or storage_manager
+        request_timeout_ = endpoint_data.request_timeout or request_timeout
 
         if storage_manager_ is None:
             raise response(
@@ -200,9 +203,9 @@ def payment_required(
 
         try:
             # TODO continue here: define these variables.
-            await process_payment(resource_url, endpoint_data.tags, reference, payment,
-                                  requirement, merged_setup, facilitator_config,
-                                  storage_manager_, webhook_url, api_key, request_timeout)
+            await process_payment(resource_url, endpoint_data.tags, reference, payment, requirement,
+                                  merged_setup, facilitator_config, storage_manager_,
+                                  endpoint_data.webhook_url, endpoint_data.api_key, request_timeout_)
             # TODO continue here: add a proper return value.
         except:
             # TODO continue here: capture all the exceptions properly.
