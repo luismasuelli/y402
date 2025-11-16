@@ -9,17 +9,18 @@ from y402.core.utils.headers import is_browser_request
 from y402.core.utils.html import get_paywall_html
 
 
-def x402_response(
-    request: Request, error: str,
+def response(
+    request: Request, status_code: int, error: str,
     custom_paywall_html: Optional[str],
     paywall_config: Optional[PaywallConfig],
     payment_requirements: List[PaymentRequirements]
 ) -> Response:
     """
-    Creates a 402 response with payment requirements.
+    Creates a dynamic response with payment requirements.
 
     Args:
         request: The current request.
+        status_code: The status code.
         error: The message of the concrete error that occurred.
         custom_paywall_html: The paywall HTML to render for HTML requests.
         paywall_config: The configuration for the paywall.
@@ -29,7 +30,6 @@ def x402_response(
     """
 
     request_headers = dict(request.headers)
-    status_code = 402
 
     if is_browser_request(request_headers):
         html_content = custom_paywall_html or get_paywall_html(
@@ -55,3 +55,27 @@ def x402_response(
             status_code=status_code,
             headers=headers,
         )
+
+
+def x402_response(
+    request: Request, error: str,
+    custom_paywall_html: Optional[str],
+    paywall_config: Optional[PaywallConfig],
+    payment_requirements: List[PaymentRequirements]
+) -> Response:
+    """
+    Creates a 402 response with payment requirements.
+
+    Args:
+        request: The current request.
+        error: The message of the concrete error that occurred.
+        custom_paywall_html: The paywall HTML to render for HTML requests.
+        paywall_config: The configuration for the paywall.
+        payment_requirements: The alternate payment requirements.
+    Returns:
+        A Response object.
+    """
+    return response(
+        request, 402, error, custom_paywall_html,
+        paywall_config, payment_requirements
+    )
