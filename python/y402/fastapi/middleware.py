@@ -218,8 +218,10 @@ def payment_required(
                                   merged_setup, facilitator_config, storage_manager_,
                                   endpoint_data.webhook_url, endpoint_data.api_key, request_timeout_)
         except:
-            # TODO continue here: capture all the exceptions properly.
-            pass
+            logger.exception("An exception occurred when interacting with the facilitator or forwarding "
+                             "the payment:")
+            return x402_response(request, "The payment was invalid or it was an error processing it",
+                                 custom_paywall_html_, paywall_config_, payment_requirements)
 
         return await call_next(request)
 
