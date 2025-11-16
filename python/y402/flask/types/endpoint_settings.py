@@ -14,7 +14,11 @@ PaymentDetailsListType = List[RequirePaymentDetails] | \
 class X402EndpointSettings(BaseX402EndpointSettings):
     """
     The settings for a single endpoint. It also works as a decorator
-    to set the settings into a specific endpoint.
+    to set the settings into a specific endpoint, which should return
+    a quick response based on the reference and nothing else, since
+    by its arrival the payment was already sent to the webhook.
+
+    This works on Flask.
     """
 
     payments_details: PaymentDetailsListType = Field(
