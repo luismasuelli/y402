@@ -206,6 +206,7 @@ def payment_required(
             return x402_response(request, "Invalid payment asset", custom_paywall_html_,
                                  paywall_config_, payment_requirements)
 
+        # 10. Pick the proper payment processor adapter.
         match client_http_library:
             case "httpx":
                 from ..lifecycle.httpx import process_payment
@@ -213,16 +214,24 @@ def payment_required(
                 return x402_response(request, "Server not properly configured", custom_paywall_html_,
                                      paywall_config_, payment_requirements)
 
+        # 11. Actually process the payment.
         try:
-            await process_payment(resource_url, endpoint_data.tags, reference, payment, requirement,
-                                  merged_setup, facilitator_config, storage_manager_,
-                                  endpoint_data.webhook_url, endpoint_data.api_key, request_timeout_)
+            payment_id = await process_payment(resource_url, endpoint_data.tags, reference, payment, requirement,
+                                               merged_setup, facilitator_config, storage_manager_,
+                                               endpoint_data.webhook_url, endpoint_data.api_key, request_timeout_)
         except:
             logger.exception("An exception occurred when interacting with the facilitator or forwarding "
                              "the payment:")
             return x402_response(request, "The payment was invalid or it was an error processing it",
                                  custom_paywall_html_, paywall_config_, payment_requirements)
 
-        return await call_next(request)
+        # 12. Call and wrap the underlying endpoint, which should have a very small logic.
+        try:
+            return await call_next(request)
+        except:
+            return response(request, 500,
+                            "An error occurred, but a payment was already processed. Contact support "
+                            f"to claim your product or service by the internal payment id: {payment_id}",
+                            custom_paywall_html_, paywall_config_, [])
 
     return middleware
