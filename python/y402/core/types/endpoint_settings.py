@@ -5,6 +5,7 @@ from .schema import HTTPInputSchema
 from .setup import Y402Setup
 from .storage import StorageManager
 
+
 X402_ENDPOINT_SETTINGS = "x402_endpoint_settings"
 
 
@@ -16,6 +17,16 @@ class X402EndpointSettings(BaseModel):
 
     resource_url: Optional[str] = Field(
         default=None, description="An optional, normalized, resource URL for this endpoint"
+    )
+    reference_param: Optional[str] = Field(
+        default=None, description="An optional field to tell which URL parameter stands for "
+                                  "the internal reference. Using references is like using "
+                                  "tags in the way that they let to identify the payment or "
+                                  "the object / product / invoice being paid, but they are "
+                                  "dynamic rather than static (inferred from the URL). It "
+                                  "is optional to use this, but once used it must match a "
+                                  "parameter from the URL. If not used, the reference will "
+                                  "be an empty string for each payment in this endpoint"
     )
     description: Optional[str] = Field(
         default=None, description="An optional endpoint description"
