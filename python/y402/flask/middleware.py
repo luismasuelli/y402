@@ -97,11 +97,11 @@ def payment_required(
 
                 if storage_manager_ is None:
                     logger.error(f"Storage manager not defined for resource {resource_url}")
-                    # TODO actually process the response. This return is not right.
-                    return response(
+                    r = response(
                         500, f"The resource {resource_url} is not properly configured",
                         custom_paywall_html_, paywall_config_, []
                     )
+                    return app.process_response(r)(environ, start_response)
 
                 reference = ''
                 if endpoint_data.reference_param is not None:
@@ -109,11 +109,11 @@ def payment_required(
                     if reference is None:
                         logger.error(f"Path parameter '{endpoint_data.reference_param}' not defined for "
                                      f"resource {resource_url}")
-                        # TODO actually process the response. This return is not right.
-                        return response(
+                        r = response(
                             500, f"The resource {resource_url} is not properly configured",
                             custom_paywall_html_, paywall_config_, []
                         )
+                        return app.process_response(r)(environ, start_response)
 
                 # 3. Given the per-endpoint configuration, get all the prices
                 #    the user can pay. All of them will be *exact*, but can
@@ -133,18 +133,18 @@ def payment_required(
                     raise
                 except PriceComputingError as e:
                     logger.exception("An error occurred at price computing stage:")
-                    # TODO actually process the response. This return is not right.
-                    return response(
+                    r = response(
                         500, f"The resource {resource_url}'s setup / pricing is not properly configured: {str(e)}",
                         custom_paywall_html_, paywall_config_, []
                     )
+                    return app.process_response(r)(environ, start_response)
                 except:
                     logger.exception("An error occurred at price computing stage:")
-                    # TODO actually process the response. This return is not right.
-                    return response(
+                    r = response(
                         500, f"The resource {resource_url}'s setup / pricing is not properly configured",
                         custom_paywall_html_, paywall_config_, []
                     )
+                    return app.process_response(r)(environ, start_response)
 
                 # 4. Construct payment details. Only one payment is supported
                 # per network, since even when it's not a problem in the protocol
@@ -177,9 +177,9 @@ def payment_required(
                 #    a payment.
                 payment_header = request.headers.get("X-PAYMENT", "")
                 if payment_header == "":
-                    # TODO actually process the response. This return is not right.
-                    return x402_response("No X-PAYMENT header provided", custom_paywall_html_,
-                                         paywall_config_, payment_requirements)
+                    r = x402_response("No X-PAYMENT header provided", custom_paywall_html_,
+                                      paywall_config_, payment_requirements)
+                    return app.process_response(r)(environ, start_response)
 
                 # 6. Extract the payment header.
                 try:
@@ -188,9 +188,9 @@ def payment_required(
                     logger.exception(
                         f"Invalid payment header format from {request.remote_addr}:"
                     )
-                    # TODO actually process the response. This return is not right.
-                    return x402_response("Invalid payment header format", custom_paywall_html_,
-                                         paywall_config_, payment_requirements)
+                    r = x402_response("Invalid payment header format", custom_paywall_html_,
+                                      paywall_config_, payment_requirements)
+                    return app.process_response(r)(environ, start_response)
 
                 # 7. Extract the extra header, perhaps, with payment token. It
                 #    must be an address, if present.
@@ -205,9 +205,9 @@ def payment_required(
                     logger.error(
                         f"Invalid payment header format from {request.remote_addr}:"
                     )
-                    # TODO actually process the response. This return is not right.
-                    return x402_response("Invalid payment asset", custom_paywall_html_,
-                                         paywall_config_, payment_requirements)
+                    r = x402_response("Invalid payment asset", custom_paywall_html_,
+                                      paywall_config_, payment_requirements)
+                    return app.process_response(r)(environ, start_response)
 
                 # 9. Pick the proper payment by the code, and make use of it later.
                 requirement = next(
@@ -217,20 +217,20 @@ def payment_required(
                     None
                 )
                 if not requirement:
-                    # TODO actually process the response. This return is not right.
-                    return x402_response("Invalid payment asset", custom_paywall_html_,
-                                         paywall_config_, payment_requirements)
+                    r = x402_response("Invalid payment asset", custom_paywall_html_,
+                                      paywall_config_, payment_requirements)
+                    return app.process_response(r)(environ, start_response)
 
                 # 10. Pick the proper payment processor adapter.
                 match client_http_library:
                     case "httpx":
                         from ..lifecycle.httpx_sync import process_payment
                     case "requests":
-                        from ..lifecycle.requests import  process_payment
+                        from ..lifecycle.requests import process_payment
                     case _:
-                        # TODO actually process the response. This return is not right.
-                        return x402_response("Server not properly configured", custom_paywall_html_,
-                                             paywall_config_, payment_requirements)
+                        r = x402_response("Server not properly configured", custom_paywall_html_,
+                                          paywall_config_, payment_requirements)
+                        return app.process_response(r)(environ, start_response)
 
                 # 11. Actually process the payment.
                 try:
@@ -245,9 +245,9 @@ def payment_required(
                 except:
                     logger.exception("An exception occurred when interacting with the facilitator or forwarding "
                                      "the payment:")
-                    # TODO actually process the response. This return is not right.
-                    return x402_response("The payment was invalid or it was an error processing it",
-                                         custom_paywall_html_, paywall_config_, payment_requirements)
+                    r = x402_response("The payment was invalid or it was an error processing it",
+                                      custom_paywall_html_, paywall_config_, payment_requirements)
+                    return app.process_response(r)(environ, start_response)
 
                 # 12. As state, keep: The payment_id, the send payment error (if any),
                 #     and the reference (it might be blank).
@@ -261,11 +261,11 @@ def payment_required(
                 try:
                     return app(environ, start_response)
                 except:
-                    # TODO actually process the response. This return is not right.
-                    return response(500,
-                                    "An error occurred, but a payment was already processed. "
-                                    "Contact support to claim your product or service by the internal payment "
-                                    f"id: {payment_id}", custom_paywall_html_, paywall_config_, [])
+                    r = response(500,
+                                 "An error occurred, but a payment was already processed. "
+                                 "Contact support to claim your product or service by the internal payment "
+                                 f"id: {payment_id}", custom_paywall_html_, paywall_config_, [])
+                    return app.process_response(r)(environ, start_response)
 
         return wsgi_app
 
