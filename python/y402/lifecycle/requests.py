@@ -1,6 +1,5 @@
-import threading
 import uuid
-from typing import List
+from typing import List, Tuple
 from uuid import uuid4
 from y402.core.types.client import PaymentPayload
 from y402.core.types.facilitator import VerifyRequest, X402_VERSION, FacilitatorConfig, SettleRequest
@@ -23,7 +22,7 @@ async def process_payment(
     webhook_url: str, api_key: str = None,
     # Tunings.
     request_timeout: int = 15, webhook_timeout: int = 15
-) -> uuid.UUID:
+) -> Tuple[uuid.UUID, Exception]:
     """
     Processes a given payment.
 
@@ -41,7 +40,8 @@ async def process_payment(
         request_timeout: The timeout for requests.
         webhook_timeout: The timeout for the webhook.
     Returns:
-        The processed UUID for this payment.
+        The processed UUID for this payment, and (if applicable) the
+        error when notifying the webhook.
     """
 
     # 1. Create the facilitator config.
@@ -78,8 +78,12 @@ async def process_payment(
             payer, chain_id, token, value,
             code, name, price_label
         )
-        threading.Thread(target=lambda: send_payment(webhook_url, settled_payment, api_key, webhook_timeout)).start()
-        return payment_id
+        send_payment_error = None
+        try:
+            send_payment(webhook_url, settled_payment, api_key, webhook_timeout)
+        except Exception as e:
+            send_payment_error = e
+        return payment_id, send_payment_error
     except:
         storage_manager.rollback(payment_id)
         raise
