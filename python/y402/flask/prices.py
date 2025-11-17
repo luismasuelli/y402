@@ -1,4 +1,3 @@
-import inspect
 from typing import List, Callable
 from flask import Request
 from y402.core.types.requirements import RequirePaymentDetails, FinalRequiredPaymentDetails
@@ -6,7 +5,7 @@ from y402.core.types.setup import Y402Setup
 from y402.core.utils.prices import resolve_final_payment
 
 
-async def compute_prices(
+def compute_prices(
     request: Request,
     prices: List[RequirePaymentDetails] | Callable[[Request], List[RequirePaymentDetails]],
     setup: Y402Setup
@@ -23,7 +22,5 @@ async def compute_prices(
 
     if callable(prices):
         prices = prices(request)
-        if inspect.isawaitable(prices):
-            prices = await prices
 
     return [resolve_final_payment(price, setup) for price in prices]
