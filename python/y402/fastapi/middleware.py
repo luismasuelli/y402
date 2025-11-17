@@ -1,3 +1,4 @@
+import traceback
 from typing import Callable, Optional, List, Literal
 import logging
 from fastapi import Request, HTTPException
@@ -220,13 +221,25 @@ def payment_required(
                                                       requirement, merged_setup, facilitator_config,
                                                       storage_manager_, endpoint_data.webhook_url,
                                                       endpoint_data.api_key, request_timeout_)
+            if error:
+                lines = traceback.format_exception(error)
+                logger.warning("WARNING!!! An error occurred while trying to forward the "
+                               "payment to the endpoint:\n" + '\n'.join(lines))
         except:
             logger.exception("An exception occurred when interacting with the facilitator or forwarding "
                              "the payment:")
             return x402_response(request, "The payment was invalid or it was an error processing it",
                                  custom_paywall_html_, paywall_config_, payment_requirements)
 
-        # 12. Call and wrap the underlying endpoint, which should have a very small logic.
+        # 12. As state, keep: The payment_id, the send payment error (if any),
+        #     and the reference (it might be blank).
+        request.state.x402 = {
+            "payment_id": payment_id,
+            "send_payment_error": error,
+            "reference": reference
+        }
+
+        # 13. Call and wrap the underlying endpoint, which should have a very small logic.
         try:
             return await call_next(request)
         except:
