@@ -216,9 +216,10 @@ def payment_required(
 
         # 11. Actually process the payment.
         try:
-            payment_id = await process_payment(resource_url, endpoint_data.tags, reference, payment, requirement,
-                                               merged_setup, facilitator_config, storage_manager_,
-                                               endpoint_data.webhook_url, endpoint_data.api_key, request_timeout_)
+            payment_id, error = await process_payment(resource_url, endpoint_data.tags, reference, payment,
+                                                      requirement, merged_setup, facilitator_config,
+                                                      storage_manager_, endpoint_data.webhook_url,
+                                                      endpoint_data.api_key, request_timeout_)
         except:
             logger.exception("An exception occurred when interacting with the facilitator or forwarding "
                              "the payment:")
