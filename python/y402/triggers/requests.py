@@ -35,6 +35,7 @@ def send_payment(webhook_url: str, settled_payment: SettledPayment,
     try:
         response = requests.post(webhook_url, headers=headers, json=settled_payment.model_dump(mode="json"),
                                  timeout=timeout)
+        response.raise_for_status()
         if response.status_code not in range(200, 300):
             raise UnsuccessfulWebhookTriggerError(response.status_code, response.content, response.headers)
     except Exception as e:
