@@ -1,4 +1,5 @@
 from typing import List, Callable, Awaitable
+from flask import Request
 from pydantic import Field
 from ...core.types.endpoint_settings import X402EndpointSettings as BaseX402EndpointSettings
 from ...core.types.requirements import RequirePaymentDetails
@@ -8,7 +9,7 @@ Y402_ENDPOINT_SETTINGS = "y402_endpoint_settings"
 
 
 PaymentDetailsListType = List[RequirePaymentDetails] | \
-                         Callable[[], Awaitable[List[RequirePaymentDetails]] | List[RequirePaymentDetails]]
+                         Callable[[Request], Awaitable[List[RequirePaymentDetails]] | List[RequirePaymentDetails]]
 
 
 class X402EndpointSettings(BaseX402EndpointSettings):
@@ -23,10 +24,9 @@ class X402EndpointSettings(BaseX402EndpointSettings):
 
     payments_details: PaymentDetailsListType = Field(
         description="Either a non-empty list of allowed payment specs or a callable returning "
-                    "a non-empty list of allowed payment specs (this callable can by sync or "
-                    "async)"
+                    "a non-empty list of allowed payment specs"
     )
 
     def __call__(self, endpoint):
-        setattr(endpoint, X402_ENDPOINT_SETTINGS, self)
+        setattr(endpoint, Y402_ENDPOINT_SETTINGS, self)
         return endpoint
