@@ -22,21 +22,3 @@ def get_root_url() -> str:
 
     # Construct root URL without path/query.
     return f"{scheme}://{host}"
-
-
-def resolve_endpoint():
-    """
-    Obtains the endpoint (function) being responsible for
-    the handing of the current request.
-
-    Returns:
-        The endpoint handling it.
-    """
-
-    # `request.endpoint` gives the endpoint name (usually the function name)
-    endpoint_name = request.endpoint
-    if endpoint_name is None:
-        return None
-
-    # `current_app.view_functions` maps endpoint names to the actual callables
-    return current_app.view_functions.get(endpoint_name)
