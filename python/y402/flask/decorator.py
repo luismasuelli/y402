@@ -96,6 +96,10 @@ def payment_required(
             # 1. Retrieve the endpoint, and the endpoint data.
             endpoint_data: Optional[X402EndpointSettings] = getattr(endpoint, Y402_ENDPOINT_SETTINGS, None)
             if not isinstance(endpoint_data, X402EndpointSettings):
+                logger.warning("The endpoint to apply this `payment_required(...)` decorator must be one "
+                               "decorated with a @X402EndpointSettings(...) instance. This endpoint has "
+                               "no @X402EndpointSettings(...) decorator, so no x402 payment logic will "
+                               f"be applied to this endpoint (url is: {request.url})")
                 return endpoint(*args, **kwargs)
 
             # 2. Get / initialize the per-endpoint aggregated networks
