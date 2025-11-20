@@ -6,7 +6,10 @@ from .eip712 import EIP712Domain
 
 
 class TokenAsset(BaseModel):
-    """Represents token asset information including EIP-712 domain data"""
+    """
+    Represents token asset information including EIP-712
+    domain data.
+    """
 
     address: str
     decimals: int
@@ -20,7 +23,10 @@ class TokenAsset(BaseModel):
 
 
 class TokenAmount(BaseModel):
-    """Represents an amount of tokens in atomic units with asset information"""
+    """
+    Represents an amount of tokens in atomic units with asset
+    information.
+    """
 
     amount: str
     asset: TokenAsset
@@ -93,6 +99,11 @@ class RequirePaymentDetails(BaseModel):
 
 
 class PaymentRequirements(BaseModel):
+    """
+    This is the details of a payment requirement that both
+    server and client agree on.
+    """
+
     scheme: str = Field(
         default='exact',
         description="The payment payload scheme, e.g. 'exact'"
