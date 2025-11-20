@@ -2,7 +2,7 @@ import uuid
 from typing import List, Tuple
 from uuid import uuid4
 from ..core.types.client import PaymentPayload
-from ..core.types.facilitator import VerifyRequest, X402_VERSION, FacilitatorConfig, SettleRequest
+from ..core.types.facilitator import VerifyRequest, X402_VERSION, FacilitatorConfig, SettleRequest, SettleResponse
 from ..core.types.requirements import PaymentRequirements
 from ..core.types.setup import Y402Setup
 from ..core.types.storage import StorageManager
@@ -22,7 +22,7 @@ async def process_payment(
     webhook_url: str, api_key: str = None,
     # Tunings.
     request_timeout: int = 15, webhook_timeout: int = 15
-) -> Tuple[uuid.UUID, Exception]:
+) -> Tuple[uuid.UUID, Exception, SettleResponse]:
     """
     Processes a given payment.
 
@@ -41,7 +41,8 @@ async def process_payment(
         webhook_timeout: The timeout for the webhook.
     Returns:
         The processed UUID for this payment, and (if applicable) the
-        error when notifying the webhook.
+        error when notifying the webhook. Also, the settle response,
+        if any.
     """
 
     # 1. Create the facilitator config.
@@ -61,7 +62,7 @@ async def process_payment(
 
     # 4. Settle the payment.
     try:
-        facilitator_client.settle(SettleRequest(
+        response = facilitator_client.settle(SettleRequest(
             x402_version=X402_VERSION,
             payment_payload=payment,
             payment_requirements=matched_requirements,
@@ -83,7 +84,7 @@ async def process_payment(
             send_payment(webhook_url, settled_payment, api_key, webhook_timeout)
         except Exception as e:
             send_payment_error = e
-        return payment_id, send_payment_error
+        return payment_id, send_payment_error, response
     except:
         storage_manager.rollback(payment_id)
         raise

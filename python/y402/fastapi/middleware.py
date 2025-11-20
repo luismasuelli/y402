@@ -1,3 +1,4 @@
+import base64
 import traceback
 from typing import Callable, Optional, List, Literal
 import logging
@@ -217,14 +218,20 @@ def payment_required(
 
         # 11. Actually process the payment.
         try:
-            payment_id, error = await process_payment(resource_url, endpoint_data.tags, reference, payment,
-                                                      requirement, merged_setup, facilitator_config,
-                                                      storage_manager_, endpoint_data.webhook_url,
-                                                      endpoint_data.api_key, request_timeout_)
+            payment_id, error, settle_response = await process_payment(
+                resource_url, endpoint_data.tags, reference, payment,
+                requirement, merged_setup, facilitator_config,
+                storage_manager_, endpoint_data.webhook_url,
+                endpoint_data.api_key, request_timeout_
+            )
             if error:
                 lines = traceback.format_exception(error)
                 logger.warning("WARNING!!! An error occurred while trying to forward the "
                                "payment to the endpoint:\n" + '\n'.join(lines))
+                if not settle_response.success:
+                    return x402_response(request, "Settle failed: " +
+                                         (settle_response.error_reason or "Unknown error"),
+                                         custom_paywall_html_, paywall_config_, payment_requirements)
         except:
             logger.exception("An exception occurred when interacting with the facilitator or forwarding "
                              "the payment:")
@@ -241,7 +248,11 @@ def payment_required(
 
         # 13. Call and wrap the underlying endpoint, which should have a very small logic.
         try:
-            return await call_next(request)
+            response_ = await call_next(request)
+            response_.headers["X-PAYMENT-RESPONSE"] = base64.b64encode(
+                settle_response.model_dump_json(by_alias=True).encode("utf-8")
+            ).decode("utf-8")
+            return response
         except:
             return response(request, 500,
                             "An error occurred, but a payment was already processed. Contact support "
