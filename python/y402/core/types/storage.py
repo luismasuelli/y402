@@ -1,6 +1,6 @@
 from uuid import uuid4
-from y402.core.types.client import PaymentPayload
-from y402.core.types.requirements import PaymentRequirements
+from ...core.types.client import PaymentPayload
+from ...core.types.requirements import PaymentRequirements
 
 
 class StorageManager:

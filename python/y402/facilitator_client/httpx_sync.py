@@ -1,5 +1,5 @@
 from .base import FacilitatorClient as BaseFacilitatorClient
-from y402.core.types.errors import ConditionalDependencyError, BaseError
+from ..core.types.errors import ConditionalDependencyError, BaseError
 from .errors import VerifyFacilitatorUnknownError, SettleFacilitatorUnknownError
 from ..core.types.facilitator import VerifyRequest, VerifyResponse, SettleResponse, SettleRequest
 

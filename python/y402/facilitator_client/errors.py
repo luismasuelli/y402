@@ -1,4 +1,4 @@
-from y402.core.types.errors import BaseError
+from ..core.types.errors import BaseError
 
 
 class HeadersBuildingFacilitatorError(BaseError):

@@ -1,6 +1,6 @@
 from eth_account import Account
 from eth_account.messages import encode_typed_data
-from y402.core.types.client import EIP3009Authorization
+from ...core.types.client import EIP3009Authorization
 
 
 def check_signature(

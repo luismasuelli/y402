@@ -1,5 +1,5 @@
 from typing import Optional, Literal
-from y402.core.types.facilitator import VerifyResponse, VerifyRequest, SettleRequest, SettleResponse, \
+from ..core.types.facilitator import VerifyResponse, VerifyRequest, SettleRequest, SettleResponse, \
     FacilitatorConfig
 from .errors import VerifyFacilitatorInvalidError, VerifyBadResponse, SettleBadResponse, SettleFacilitatorFailedError
 from .utils import make_headers

@@ -1,7 +1,7 @@
 import datetime
 from typing import List
 from uuid import uuid4
-from y402.core.types.payment import SettledPayment, PaymentIdentity, PaymentDetails
+from ..core.types.payment import SettledPayment, PaymentIdentity, PaymentDetails
 
 
 def create_settled_payment(

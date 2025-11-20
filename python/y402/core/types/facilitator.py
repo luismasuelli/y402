@@ -1,8 +1,8 @@
 from typing import Dict, Literal, Callable, Awaitable, Optional
 from pydantic import BaseModel, Field, ConfigDict
 from pydantic.alias_generators import to_camel
-from y402.core.types.client import PaymentPayload
-from y402.core.types.requirements import PaymentRequirements
+from ...core.types.client import PaymentPayload
+from ...core.types.requirements import PaymentRequirements
 
 
 X402_VERSION = 1

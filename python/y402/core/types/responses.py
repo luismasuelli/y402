@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
-from y402.core.types.requirements import PaymentRequirements
+from ...core.types.requirements import PaymentRequirements
 
 
 class x402PaymentRequiredResponse(BaseModel):

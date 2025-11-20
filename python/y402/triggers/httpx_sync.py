@@ -1,7 +1,7 @@
 from typing import Optional
-from y402.core.types.errors import ConditionalDependencyError
-from y402.core.types.payment import SettledPayment
-from y402.triggers.errors import UnsuccessfulWebhookTriggerError, ExceptionOnWebhookTriggerError
+from ..core.types.errors import ConditionalDependencyError
+from ..core.types.payment import SettledPayment
+from ..triggers.errors import UnsuccessfulWebhookTriggerError, ExceptionOnWebhookTriggerError
 
 
 try:

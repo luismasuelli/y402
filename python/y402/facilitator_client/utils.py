@@ -1,8 +1,8 @@
 import inspect
 import asyncio
 from typing import Literal
-from y402.core.types.facilitator import FacilitatorHeaders
-from y402.facilitator_client.errors import HeadersBuildingFacilitatorError
+from ..core.types.facilitator import FacilitatorHeaders
+from ..facilitator_client.errors import HeadersBuildingFacilitatorError
 
 
 def make_headers(headers: FacilitatorHeaders, endpoint: Literal["settle", "verify"]) -> dict:

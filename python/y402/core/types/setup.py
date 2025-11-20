@@ -1,6 +1,6 @@
 from typing import Tuple, Optional, List
 from decimal import Decimal
-from y402.core.types.errors import MisconfigurationError
+from ...core.types.errors import MisconfigurationError
 
 
 KNOWN_DATA = {
