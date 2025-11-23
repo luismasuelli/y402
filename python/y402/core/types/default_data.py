@@ -1,4 +1,4 @@
-KNOWN_DATA = {
+KNOWN_NETWORKS_AND_TOKENS = {
     "base": {
         "chain_id": 8453,
         "tokens": {

@@ -1,7 +1,7 @@
 from typing import Tuple, Optional, List
 from decimal import Decimal
 from .errors import MisconfigurationError
-from .default_data import KNOWN_DATA
+from .default_data import KNOWN_NETWORKS_AND_TOKENS
 
 
 class Y402Setup:
@@ -33,8 +33,8 @@ class Y402Setup:
         network = network.strip().lower()
         if network in self._networks:
             raise MisconfigurationError(f"This network is already set up: {network}")
-        if network in KNOWN_DATA and chain_id < 1:
-            chain_id = KNOWN_DATA[network]["chain_id"]
+        if network in KNOWN_NETWORKS_AND_TOKENS and chain_id < 1:
+            chain_id = KNOWN_NETWORKS_AND_TOKENS[network]["chain_id"]
         if chain_id < 1:
             raise MisconfigurationError(f"Invalid chain id for network key: {network}")
         self._networks[network] = {
@@ -88,8 +88,8 @@ class Y402Setup:
         if symbol in " 0123456789." or len(symbol) > 1:
             raise MisconfigurationError(f"Invalidd symbol: {symbol}")
 
-        if code in KNOWN_DATA[network]["tokens"]:
-            known_token = KNOWN_DATA[network]["tokens"][code]
+        if code in KNOWN_NETWORKS_AND_TOKENS[network]["tokens"]:
+            known_token = KNOWN_NETWORKS_AND_TOKENS[network]["tokens"][code]
             decimals = decimals or known_token["decimals"]
             version = version or known_token["eip712Version"]
             symbol = symbol or known_token["symbol"]
