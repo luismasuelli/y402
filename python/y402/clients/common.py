@@ -181,7 +181,11 @@ class X402Client:
             account: eth_account.Account instance for signing payments.
             payment_requirements_selector: Optional custom selector for payment requirements.
             chain_id_by_name: An optional mapping of extra networks to map (useful when there
-                              are more networks to be used by the server).
+                              are more networks to be used by the server). This is useful for
+                              when the remote x402 server implements custom networks and does
+                              not implement y402, for y402 implementations will tell another
+                              way to establish that mapping to y402-compatible clients (like
+                              this one).
         """
 
         self.account = account
