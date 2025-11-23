@@ -1,4 +1,4 @@
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Dict
 from decimal import Decimal
 from .errors import MisconfigurationError
 from .default_data import KNOWN_NETWORKS_AND_TOKENS
@@ -257,9 +257,19 @@ class Y402Setup:
         """
 
         try:
-            return self._networks[network]
+            return self._networks[network]["chain_id"]
         except:
             raise MisconfigurationError(f"This network is not set up: {network}")
+
+    def get_chain_ids_mapping(self) -> Dict[str, int]:
+        """
+        Returns the available mapping of name => chain_id.
+
+        Returns:
+            A dictionary mapping name => chain_id from this setup.
+        """
+
+        return {key: value["chain_id"] for key, value in self._networks.items()}
 
     def parse_price_label(self, network: str, label: str) -> tuple[str, str]:
         """
