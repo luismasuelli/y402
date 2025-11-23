@@ -203,16 +203,16 @@ class Y402Client:
         """Select payment requirements from the list of accepted requirements.
 
         Args:
-            accepts: List of accepted payment requirements
-            network_filter: Optional network to filter by
-            scheme_filter: Optional scheme to filter by
+            accepts: List of accepted payment requirements.
+            network_filter: Optional network to filter by.
+            scheme_filter: Optional scheme to filter by.
 
         Returns:
-            Selected payment requirements (PaymentRequirements instance from x402.types)
+            Selected payment requirements (PaymentRequirements instance from x402.types).
 
         Raises:
-            UnsupportedSchemeException: If no supported scheme is found
-            PaymentAmountExceededError: If payment amount exceeds max_value
+            UnsupportedSchemeException: If no supported scheme is found.
+            PaymentAmountExceededError: If payment amount exceeds max_value.
         """
 
         for paymentRequirements in accepts:
@@ -242,16 +242,16 @@ class Y402Client:
         Select payment requirements using the configured selector.
 
         Args:
-            accepts: List of accepted payment requirements (PaymentRequirements models)
-            network_filter: Optional network to filter by
-            scheme_filter: Optional scheme to filter by
+            accepts: List of accepted payment requirements (PaymentRequirements models).
+            network_filter: Optional network to filter by.
+            scheme_filter: Optional scheme to filter by.
 
         Returns:
-            Selected payment requirements (PaymentRequirements instance from x402.types)
+            Selected payment requirements (PaymentRequirements instance from x402.types).
 
         Raises:
-            UnsupportedSchemeException: If no supported scheme is found
-            PaymentAmountExceededError: If payment amount exceeds max_value
+            UnsupportedSchemeException: If no supported scheme is found.
+            PaymentAmountExceededError: If payment amount exceeds max_value.
         """
 
         return self._payment_requirements_selector(
@@ -267,11 +267,11 @@ class Y402Client:
         Create a payment header for the given requirements.
 
         Args:
-            payment_requirements: Selected payment requirements
-            x402_version: x402 protocol version
+            payment_requirements: Selected payment requirements.
+            x402_version: x402 protocol version.
 
         Returns:
-            Signed payment header
+            Signed payment header.
         """
 
         unsigned_header = {
@@ -303,7 +303,7 @@ class Y402Client:
 
     def generate_nonce(self):
         """
-        Generate a random nonce (32 bytes = 64 hex chars)
+        Generate a random nonce (32 bytes = 64 hex chars).
 
         Returns:
             The generated nonce.
