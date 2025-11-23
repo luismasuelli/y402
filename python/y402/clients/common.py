@@ -184,7 +184,7 @@ class X402Client:
                               are more networks to be used by the server).
         """
 
-        self.account = account,
+        self.account = account
         self.chain_id_by_name = {**DEFAULT_CHAIN_ID_BY_NAME, **(chain_id_by_name or {})}
         self._payment_requirements_selector = (
             payment_requirements_selector or self.default_payment_requirements_selector
