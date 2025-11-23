@@ -14,7 +14,7 @@ SUPPORTED_X402_VERSIONS = [1]
 
 # A mapping with the default networks and their id.
 DEFAULT_CHAIN_ID_BY_NAME = {
-    key: value["chain_id"] for key, value in KNOWN_NETWORKS_AND_TOKENS
+    key: value["chain_id"] for key, value in KNOWN_NETWORKS_AND_TOKENS.items()
 }
 
 
