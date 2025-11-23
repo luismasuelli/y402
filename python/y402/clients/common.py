@@ -163,7 +163,7 @@ def decode_x_payment_response(header: str) -> Dict[str, Any]:
     return json.loads(decoded)
 
 
-class X402Client:
+class Y402Client:
     """
     Base client for handling x402 payments.
     """
@@ -175,7 +175,7 @@ class X402Client:
         chain_id_by_name: Optional[Dict[str, int]] = None
     ):
         """
-        Initialize the x402 client.
+        Initialize the x402 (actually: y402) client.
 
         Args:
             account: eth_account.Account instance for signing payments.
