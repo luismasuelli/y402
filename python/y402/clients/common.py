@@ -262,6 +262,7 @@ class Y402Client:
         self,
         payment_requirements: PaymentRequirements,
         x402_version: int = SUPPORTED_X402_VERSIONS[-1],
+        y402_chain_id_by_name: Optional[Dict[str, int]] = None
     ) -> str:
         """
         Create a payment header for the given requirements.
@@ -269,6 +270,8 @@ class Y402Client:
         Args:
             payment_requirements: Selected payment requirements.
             x402_version: x402 protocol version.
+            y402_chain_id_by_name: The optional (y402-only) response-header-provided
+                                   mapping of the server-known networks.
 
         Returns:
             Signed payment header.
@@ -297,7 +300,7 @@ class Y402Client:
             self.account,
             payment_requirements,
             unsigned_header,
-            self.chain_id_by_name
+            {**self.chain_id_by_name, **(y402_chain_id_by_name or {})}
         )
         return signed_header
 
