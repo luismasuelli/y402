@@ -163,6 +163,21 @@ def decode_x_payment_response(header: str) -> Dict[str, Any]:
     return json.loads(decoded)
 
 
+def decode_x_payment_networks(header: str) -> Dict[str, int]:
+    """
+    Decodes the X-PAYMENT_NETWORKS header.
+
+    Args:
+        header: The X-PAYMENT-NETWORKS header to decode.
+
+    Returns:
+        The decoded payment networks mapping like name => chain_id.
+    """
+
+    decoded = base64.b64decode(header).decode("utf-8")
+    return json.loads(decoded)
+
+
 class Y402Client:
     """
     Base client for handling x402 payments.
