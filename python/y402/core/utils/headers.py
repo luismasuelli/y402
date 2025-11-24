@@ -44,7 +44,7 @@ def validate_payment_asset(
     payment_payload: PaymentPayload,
     payment_asset_header: str,
     merged_setup: Y402Setup
-) -> Tuple[str, bool]:
+) -> Tuple[str, str, bool]:
     """
     Validates whether the asset in the payment asset header is valid or not.
 
@@ -54,7 +54,7 @@ def validate_payment_asset(
         payment_asset_header: The contents of the payment asset header.
         merged_setup: The current merged setup.
     Returns:
-        A tuple (code, True) or ("", False).
+        A tuple (code, address, True) or ("", "", False).
     """
 
     token_codes = merged_setup.list_tokens(network)
@@ -67,5 +67,5 @@ def validate_payment_asset(
                            payment_payload.payload.authorization,
                            payment_payload.payload.signature) and \
                 (not payment_asset_header or payment_asset_header == address.lower()):
-            return code, True
-    return "", False
+            return code, address, True
+    return "", "", False

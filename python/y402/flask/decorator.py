@@ -217,7 +217,7 @@ def payment_required(
             #    which token was selected. Otherwise, iterate until a
             #    token matches the signature.
             network = payment.network
-            code, ok = validate_payment_asset(network, payment, payment_asset_header, merged_setup)
+            code, asset, ok = validate_payment_asset(network, payment, payment_asset_header, merged_setup)
             if not ok:
                 logger.error(
                     f"Invalid payment header format from {request.remote_addr}:"
@@ -229,7 +229,7 @@ def payment_required(
             requirement = next(
                 (requirement
                  for requirement in payment_requirements
-                 if requirement.asset == payment_asset_header and requirement.network == network),
+                 if requirement.asset == asset and requirement.network == network),
                 None
             )
             if not requirement:
