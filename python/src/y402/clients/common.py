@@ -20,8 +20,8 @@ DEFAULT_CHAIN_ID_BY_NAME = {
 
 # Define type for the payment requirements selector.
 PaymentSelectorCallable = Callable[
-    # Args are: accepts, network_filter, scheme_filter.
-    [List[PaymentRequirements], Optional[str], Optional[str]],
+    # Args are: available payment alternatives.
+    [List[PaymentRequirements]],
     PaymentRequirements,
 ]
 
@@ -211,16 +211,12 @@ class Y402Client:
 
     @staticmethod
     def default_payment_requirements_selector(
-        accepts: List[PaymentRequirements],
-        network_filter: Optional[str] = None,
-        scheme_filter: Optional[str] = None
+        accepts: List[PaymentRequirements]
     ) -> PaymentRequirements:
         """Select payment requirements from the list of accepted requirements.
 
         Args:
             accepts: List of accepted payment requirements.
-            network_filter: Optional network to filter by.
-            scheme_filter: Optional scheme to filter by.
 
         Returns:
             Selected payment requirements (PaymentRequirements instance from x402.types).
@@ -232,15 +228,7 @@ class Y402Client:
 
         for paymentRequirements in accepts:
             scheme = paymentRequirements.scheme
-            network = paymentRequirements.network
-
-            # Check scheme filter
-            if scheme_filter and scheme != scheme_filter:
-                continue
-
-            # Check network filter
-            if network_filter and network != network_filter:
-                continue
+            # network = paymentRequirements.network
 
             if scheme == "exact":
                 return paymentRequirements
@@ -249,17 +237,13 @@ class Y402Client:
 
     def select_payment_requirements(
         self,
-        accepts: List[PaymentRequirements],
-        network_filter: Optional[str] = None,
-        scheme_filter: Optional[str] = None,
+        accepts: List[PaymentRequirements]
     ) -> PaymentRequirements:
         """
         Select payment requirements using the configured selector.
 
         Args:
             accepts: List of accepted payment requirements (PaymentRequirements models).
-            network_filter: Optional network to filter by.
-            scheme_filter: Optional scheme to filter by.
 
         Returns:
             Selected payment requirements (PaymentRequirements instance from x402.types).
@@ -269,9 +253,7 @@ class Y402Client:
             PaymentAmountExceededError: If payment amount exceeds max_value.
         """
 
-        return self._payment_requirements_selector(
-            accepts, network_filter, scheme_filter
-        )
+        return self._payment_requirements_selector(accepts)
 
     def create_payment_header(
         self,
