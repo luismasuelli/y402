@@ -17,6 +17,7 @@ async def compute_prices(
         prices: Either the prices or a callable based on the request and returning the prices.
                 Always one single price per network.
         setup: The underlying, final, Y402Setup to compute the prices from.
+
     Returns:
         A list of final required payment details.
     """

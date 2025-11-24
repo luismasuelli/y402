@@ -30,6 +30,7 @@ def create_settled_payment(
         code: The codename of the token (optional, or "" - typically provided).
         name: The name of the token (optional, or "" - typically provided).
         price_label: The price label of this payment.
+
     Returns:
         A settled payment record.
     """

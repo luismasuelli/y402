@@ -8,6 +8,7 @@ def get_root_url(request: Request) -> str:
 
     Args:
         request: The current request.
+
     Returns:
         The base proto://host url.
     """
@@ -34,6 +35,7 @@ def resolve_endpoint(request: Request):
 
     Args:
         request: The request to analyze.
+
     Returns:
         The endpoint handling it.
     """

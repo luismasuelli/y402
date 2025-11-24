@@ -54,6 +54,7 @@ def payment_required(
                          configured to be Y402-defined. Storage managers are used to store the requested
                          and paid-for jobs.
         request_timeout: The timeout for the webhook requests.
+
     Returns:
         A middleware function, to be used in an existing Flask app (and returning
         a new app).
@@ -82,6 +83,7 @@ def payment_required(
 
         Args:
             endpoint: The endpoint function to wrap.
+
         Returns:
             The wrapped endpoint.
         """

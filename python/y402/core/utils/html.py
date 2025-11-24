@@ -66,6 +66,7 @@ def inject_payment_data(
         error: Error message to display.
         payment_requirements: List of payment requirements.
         paywall_config: Optional paywall UI configuration.
+
     Returns:
         The final contents.
     """
@@ -102,6 +103,7 @@ def get_paywall_html(
         error: Error message to display.
         payment_requirements: List of payment requirements.
         paywall_config: Optional paywall UI configuration.
+
     Returns:
         Complete HTML with injected payment data.
     """

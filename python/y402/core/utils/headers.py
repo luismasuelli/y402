@@ -12,6 +12,7 @@ def is_browser_request(headers: Dict[str, Any]) -> bool:
 
     Args:
         headers: Dictionary of request headers (case-insensitive keys).
+
     Returns:
         True if request appears to be from a browser, False otherwise.
     """
@@ -32,6 +33,7 @@ def decode_payment_header(payment_header: str) -> PaymentPayload:
 
     Args:
         payment_header: The contents of the payment header.
+
     Returns:
         The parsed payment payload.
     """
@@ -53,6 +55,7 @@ def validate_payment_asset(
         payment_payload: The provided payment payload.
         payment_asset_header: The contents of the payment asset header.
         merged_setup: The current merged setup.
+
     Returns:
         A tuple (code, address, True) or ("", "", False).
     """

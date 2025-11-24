@@ -52,6 +52,7 @@ def payment_required(
                          configured to be Y402-defined. Storage managers are used to store the requested
                          and paid-for jobs.
         request_timeout: The timeout for the webhook requests.
+
     Returns:
         A middleware function.
     """
@@ -66,6 +67,7 @@ def payment_required(
             request: The request.
             call_next: A function to invoke next (typically,
                 the next middleware in the list, or endpoint).
+
         Returns:
             The response.
         """

@@ -20,6 +20,7 @@ class FacilitatorClient:
 
         Args:
             endpoint: 'verify' or 'settle'.
+
         Returns:
             The dictionary of headers.
         """
@@ -44,6 +45,7 @@ class FacilitatorClient:
 
         Args:
             obj: The dictionary to parse.
+
         Returns:
             The parsed object.
         """
@@ -60,6 +62,7 @@ class FacilitatorClient:
         Args:
             request: The current request.
             timeout: The timeout.
+
         Returns:
             The verify response.
         """
@@ -84,6 +87,7 @@ class FacilitatorClient:
 
         Args:
             obj: The dictionary to parse.
+
         Returns:
             The parsed object.
         """
@@ -100,6 +104,7 @@ class FacilitatorClient:
         Args:
             request: The current request.
             timeout: The timeout.
+
         Returns:
             The settle response.
         """

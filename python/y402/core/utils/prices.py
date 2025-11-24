@@ -56,6 +56,7 @@ def resolve_final_payment(
     Args:
         required_payment: The required payment to base the final payment on.
         setup: The final setup for an endpoint.
+
     Returns:
         The final payment requirement.
     """

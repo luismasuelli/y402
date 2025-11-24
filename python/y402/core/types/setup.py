@@ -169,6 +169,7 @@ class Y402Setup:
 
         Args:
             network: The network name for which the token will be defaulted.
+
         Returns:
             The default token code of that network.
         """
@@ -183,6 +184,7 @@ class Y402Setup:
             value: A decimal representation of the amount.
             decimals: The amount of digits that are decimal places.
             symbol: The currency symbol.
+
         Returns:
             A textual representation.
         """
@@ -196,6 +198,7 @@ class Y402Setup:
 
         Args:
             network: The network name for which the tokens will be listed.
+
         Returns:
             The list of registered tokens.
         """
@@ -213,6 +216,7 @@ class Y402Setup:
             network: The network name for which the token will be defaulted.
             code: An internal name for an existing token contract in the
                   network in this setup.
+
         Returns:
             The associated metadata.
         """
@@ -229,6 +233,7 @@ class Y402Setup:
             network: The name of the network.
             token: The address of the token contract.
             value: A decimal representation of the amount.
+
         Returns:
             A tuple (chain_id, code, name, price_label).
         """
@@ -252,6 +257,7 @@ class Y402Setup:
 
         Args:
             network: The name of the network.
+
         Returns:
             An integer being the chain id.
         """
@@ -278,6 +284,7 @@ class Y402Setup:
         Args:
             network: The name of the network.
             label: The label to parse.
+
         Returns:
             The parsed token price, as (asset address, amount).
         """

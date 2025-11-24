@@ -12,6 +12,7 @@ def make_headers(headers: FacilitatorHeaders, endpoint: Literal["settle", "verif
     Args:
         headers: The headers spec for the facilitator.
         endpoint: 'settle' or 'verify'.
+
     Returns:
         A dictionary with the headers.
     """

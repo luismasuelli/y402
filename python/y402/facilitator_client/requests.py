@@ -23,6 +23,7 @@ class FacilitatorClient(BaseFacilitatorClient):
         Args:
             request: The current request.
             timeout: The timeout.
+
         Returns:
             The verify response.
         """
@@ -49,6 +50,7 @@ class FacilitatorClient(BaseFacilitatorClient):
         Args:
             request: The current request.
             timeout: The timeout.
+
         Returns:
             The settle response.
         """
