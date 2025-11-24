@@ -1,6 +1,8 @@
 import datetime
 from typing import List
 from uuid import uuid4
+
+from ..core.types.facilitator import Y402_VERSION
 from ..core.types.payment import SettledPayment, PaymentIdentity, PaymentDetails
 
 
@@ -37,6 +39,7 @@ def create_settled_payment(
 
     return SettledPayment(
         id_=str(payment_id),
+        version=Y402_VERSION,
         identity=PaymentIdentity(
             resource=resource,
             tags=tags,

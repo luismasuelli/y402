@@ -65,6 +65,9 @@ class SettledPayment(BaseModel):
     id_: str = Field(
         description="The unique ID of the payment"
     )
+    version: int = Field(
+        description="The y402 version"
+    )
     identity: PaymentIdentity = Field(
         description="The identity of the payment (with identifier and category)"
     )
