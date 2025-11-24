@@ -70,7 +70,7 @@ class HttpxHooks:
             request = response.request
 
             request.headers["X-Payment"] = payment_header
-            request.headers["Access-Control-Expose-Headers"] = "X-Payment-Response, X-Payment-Response"
+            request.headers["Access-Control-Expose-Headers"] = "X-Payment-Response, X-Payment-Networks"
 
             # Retry the request.
             async with AsyncClient() as client:
@@ -81,7 +81,6 @@ class HttpxHooks:
                 response.headers = retry_response.headers
                 response._content = retry_response._content
                 return response
-
         except PaymentError as e:
             self._is_retry = False
             raise e
@@ -143,11 +142,10 @@ class Y402Client(AsyncClient):
         **kwargs
     ):
         """
-        Initialize an AsyncClient with x402 payment handling.
+        Initialize an AsyncClient with x402 payment handling (plus y402 enhancements).
 
         Args:
             account: eth_account.Account instance for signing payments.
-            max_value: Optional maximum allowed payment amount in base units.
             payment_requirements_selector: Optional custom selector for payment requirements.
                 Should be a callable that takes (accepts, network_filter, scheme_filter)
                 and returns a PaymentRequirements object.
