@@ -1,4 +1,6 @@
-from typing import Optional, List
+import base64
+import json
+from typing import Optional, List, Dict
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse, HTMLResponse
 from ..core.types.facilitator import X402_VERSION
@@ -13,7 +15,8 @@ def response(
     request: Request, status_code: int, error: str,
     custom_paywall_html: Optional[str],
     paywall_config: Optional[PaywallConfig],
-    payment_requirements: List[PaymentRequirements]
+    payment_requirements: List[PaymentRequirements],
+    chain_id_by_name: Dict[str, int]
 ) -> Response:
     """
     Creates a dynamic response with payment requirements.
@@ -25,17 +28,25 @@ def response(
         custom_paywall_html: The paywall HTML to render for HTML requests.
         paywall_config: The configuration for the paywall.
         payment_requirements: The alternate payment requirements.
+        chain_id_by_name: A mapping name => chain_id from the current setup.
+
     Returns:
         A Response object.
     """
 
     request_headers = dict(request.headers)
+    encoded_networks_mapping = base64.b64encode(
+        json.dumps(chain_id_by_name).encode("utf-8")
+    ).decode("utf-8") if chain_id_by_name else None
+    headers = {
+        "X-Payment-Networks": encoded_networks_mapping
+    } if encoded_networks_mapping else {}
 
     if is_browser_request(request_headers):
         html_content = custom_paywall_html or get_paywall_html(
             error, payment_requirements, paywall_config
         )
-        headers = {"Content-Type": "text/html; charset=utf-8"}
+        headers["Content-Type"] = "text/html; charset=utf-8"
 
         return HTMLResponse(
             content=html_content,
@@ -48,7 +59,7 @@ def response(
             accepts=payment_requirements,
             error=error,
         ).model_dump(by_alias=True)
-        headers = {"Content-Type": "application/json"}
+        headers["Content-Type"] = "application/json"
 
         return JSONResponse(
             content=response_data,
@@ -61,7 +72,8 @@ def x402_response(
     request: Request, error: str,
     custom_paywall_html: Optional[str],
     paywall_config: Optional[PaywallConfig],
-    payment_requirements: List[PaymentRequirements]
+    payment_requirements: List[PaymentRequirements],
+    chain_id_by_name: Dict[str, int]
 ) -> Response:
     """
     Creates a 402 response with payment requirements.
@@ -72,10 +84,13 @@ def x402_response(
         custom_paywall_html: The paywall HTML to render for HTML requests.
         paywall_config: The configuration for the paywall.
         payment_requirements: The alternate payment requirements.
+        chain_id_by_name: A mapping name => chain_id from the current setup.
+
     Returns:
         A Response object.
     """
+
     return response(
         request, 402, error, custom_paywall_html,
-        paywall_config, payment_requirements
+        paywall_config, payment_requirements, chain_id_by_name
     )

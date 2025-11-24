@@ -121,7 +121,7 @@ def payment_required(
                 logger.error(f"Storage manager not defined for resource {resource_url}")
                 return response(
                     500, f"The resource {resource_url} is not properly configured",
-                    custom_paywall_html_, paywall_config_, []
+                    custom_paywall_html_, paywall_config_, [], {}
                 )
 
             reference = ''
@@ -132,7 +132,7 @@ def payment_required(
                                  f"resource {resource_url}")
                     return response(
                         500, f"The resource {resource_url} is not properly configured",
-                        custom_paywall_html_, paywall_config_, []
+                        custom_paywall_html_, paywall_config_, [], {}
                     )
 
             # 3. Given the per-endpoint configuration, get all the prices
@@ -145,6 +145,7 @@ def payment_required(
             #    - The pay-to address.
             try:
                 merged_setup: Y402Setup = registry[endpoint]
+                chain_id_by_name = merged_setup.get_chain_ids_mapping()
                 prices: List[FinalRequiredPaymentDetails] = compute_prices(
                     request, endpoint_data.payments_details, merged_setup
                 )
@@ -155,13 +156,13 @@ def payment_required(
                 logger.exception("An error occurred at price computing stage:")
                 return response(
                     500, f"The resource {resource_url}'s setup / pricing is not properly configured: {str(e)}",
-                    custom_paywall_html_, paywall_config_, []
+                    custom_paywall_html_, paywall_config_, [], {}
                 )
             except:
                 logger.exception("An error occurred at price computing stage:")
                 return response(
                     500, f"The resource {resource_url}'s setup / pricing is not properly configured",
-                    custom_paywall_html_, paywall_config_, []
+                    custom_paywall_html_, paywall_config_, [], {}
                 )
 
             # 4. Construct payment details. Only one payment is supported
@@ -196,7 +197,7 @@ def payment_required(
             payment_header = request.headers.get("X-PAYMENT", "")
             if payment_header == "":
                 return x402_response("No X-PAYMENT header provided", custom_paywall_html_,
-                                     paywall_config_, payment_requirements)
+                                     paywall_config_, payment_requirements, chain_id_by_name)
 
             # 6. Extract the payment header.
             try:
@@ -206,7 +207,7 @@ def payment_required(
                     f"Invalid payment header format from {request.remote_addr}:"
                 )
                 return x402_response("Invalid payment header format", custom_paywall_html_,
-                                     paywall_config_, payment_requirements)
+                                     paywall_config_, payment_requirements, chain_id_by_name)
 
             # 7. Extract the extra header, perhaps, with payment token. It
             #    must be an address, if present.
@@ -222,7 +223,7 @@ def payment_required(
                     f"Invalid payment header format from {request.remote_addr}:"
                 )
                 return x402_response("Invalid payment asset", custom_paywall_html_,
-                                     paywall_config_, payment_requirements)
+                                     paywall_config_, payment_requirements, chain_id_by_name)
 
             # 9. Pick the proper payment by the code, and make use of it later.
             requirement = next(
@@ -233,7 +234,7 @@ def payment_required(
             )
             if not requirement:
                 return x402_response("Invalid payment asset", custom_paywall_html_,
-                                     paywall_config_, payment_requirements)
+                                     paywall_config_, payment_requirements, chain_id_by_name)
 
             # 10. Pick the proper payment processor adapter.
             match client_http_library:
@@ -243,7 +244,7 @@ def payment_required(
                     from ..lifecycle.requests import process_payment
                 case _:
                     return x402_response("Server not properly configured", custom_paywall_html_,
-                                         paywall_config_, payment_requirements)
+                                         paywall_config_, payment_requirements, chain_id_by_name)
 
             # 11. Actually process the payment.
             try:
@@ -260,12 +261,13 @@ def payment_required(
                     if not settle_response.success:
                         return x402_response("Settle failed: " +
                                              (settle_response.error_reason or "Unknown error"),
-                                             custom_paywall_html_, paywall_config_, payment_requirements)
+                                             custom_paywall_html_, paywall_config_, payment_requirements,
+                                             chain_id_by_name)
             except:
                 logger.exception("An exception occurred when interacting with the facilitator or forwarding "
                                  "the payment:")
                 return x402_response("The payment was invalid or it was an error processing it",
-                                     custom_paywall_html_, paywall_config_, payment_requirements)
+                                     custom_paywall_html_, paywall_config_, payment_requirements, chain_id_by_name)
 
             # 12. As state, keep: The payment_id, the send payment error (if any),
             #     and the reference (it might be blank).
@@ -286,7 +288,8 @@ def payment_required(
                 return response(500,
                                 "An error occurred, but a payment was already processed. "
                                 "Contact support to claim your product or service by the internal payment "
-                                f"id: {payment_id}", custom_paywall_html_, paywall_config_, [])
+                                f"id: {payment_id}", custom_paywall_html_, paywall_config_, [],
+                                chain_id_by_name)
 
         return new_endpoint
 
