@@ -1,5 +1,6 @@
+import inspect
 import uuid
-from typing import List, Tuple
+from typing import List, Tuple, Any
 from uuid import uuid4
 from ..core.types.client import PaymentPayload
 from ..core.types.facilitator import VerifyRequest, X402_VERSION, FacilitatorConfig, SettleRequest, SettleResponse
@@ -9,6 +10,13 @@ from ..core.types.storage import StorageManager
 from ..facilitator_client.httpx_sync import FacilitatorClient
 from ..lifecycle.utils import create_settled_payment
 from ..triggers.httpx_sync import send_payment
+
+
+def _forbid_awaitable(result: Any, method: str) -> Any:
+    if inspect.isawaitable(result):
+        raise TypeError(f"The result of StorageManage.{method}(...) must not be an awaitable "
+                        "in this process_payment implementation")
+    return result
 
 
 async def process_payment(
@@ -57,7 +65,7 @@ async def process_payment(
 
     # 3. Store the verified payment.
     payment_id = uuid4()
-    storage_manager.allocate(payment_id, payment, matched_requirements)
+    _forbid_awaitable(storage_manager.allocate(payment_id, payment, matched_requirements), "allocate")
 
     # 4. Settle the payment.
     try:
@@ -67,7 +75,7 @@ async def process_payment(
             payment_requirements=matched_requirements,
             timeout=request_timeout
         ))
-        storage_manager.commit(payment_id)
+        _forbid_awaitable(storage_manager.commit(payment_id), "commit")
         payer = payment.payload.authorization.from_
         network = payment.network
         token = matched_requirements.asset
@@ -87,5 +95,5 @@ async def process_payment(
             send_payment_error = e
         return payment_id, send_payment_error, response
     except:
-        storage_manager.rollback(payment_id)
+        _forbid_awaitable(storage_manager.rollback(payment_id), "rollback")
         raise

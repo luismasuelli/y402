@@ -1,5 +1,6 @@
+import inspect
 import uuid
-from typing import List, Tuple
+from typing import List, Tuple, Any
 from uuid import uuid4
 from ..core.types.client import PaymentPayload
 from ..core.types.facilitator import VerifyRequest, X402_VERSION, FacilitatorConfig, SettleRequest, SettleResponse
@@ -9,6 +10,12 @@ from ..core.types.storage import StorageManager
 from ..facilitator_client.httpx import FacilitatorClient
 from ..lifecycle.utils import create_settled_payment
 from ..triggers.httpx import send_payment
+
+
+async def _maybe_await(result: Any) -> Any:
+    if inspect.isawaitable(result):
+        result = await result
+    return result
 
 
 async def process_payment(
@@ -57,7 +64,7 @@ async def process_payment(
 
     # 3. Store the verified payment.
     payment_id = uuid4()
-    await storage_manager.allocate(payment_id, payment, matched_requirements)
+    await _maybe_await(storage_manager.allocate(payment_id, payment, matched_requirements))
 
     # 4. Settle the payment.
     try:
@@ -67,7 +74,7 @@ async def process_payment(
             payment_requirements=matched_requirements,
             timeout=request_timeout
         ))
-        await storage_manager.commit(payment_id)
+        await _maybe_await(storage_manager.commit(payment_id))
         payer = payment.payload.authorization.from_
         network = payment.network
         token = matched_requirements.asset
@@ -87,5 +94,5 @@ async def process_payment(
             send_payment_error = e
         return payment_id, send_payment_error, response
     except:
-        await storage_manager.rollback(payment_id)
+        await _maybe_await(storage_manager.rollback(payment_id))
         raise
