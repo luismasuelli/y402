@@ -253,8 +253,7 @@ def payment_required(
                 payment_id, error, settle_response = process_payment(
                     resource_url, endpoint_data.tags, reference, payment,
                     requirement, merged_setup, facilitator_config,
-                    storage_manager_, endpoint_data.webhook_url,
-                    endpoint_data.api_key, request_timeout_
+                    storage_manager_, endpoint_data.webhook_name
                 )
                 if error:
                     lines = traceback.format_exception(error)

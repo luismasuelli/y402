@@ -19,9 +19,9 @@ async def process_payment(
     # External components.
     setup: Y402Setup, facilitator_config: FacilitatorConfig, storage_manager: StorageManager,
     # Webhook-related data.
-    webhook_url: str, api_key: str = None,
+    webhook_name: str,
     # Tunings.
-    request_timeout: int = 15, webhook_timeout: int = 15
+    request_timeout: int = 15
 ) -> Tuple[uuid.UUID, Exception, SettleResponse]:
     """
     Processes a given payment.
@@ -35,10 +35,8 @@ async def process_payment(
         setup: An existing Y402 setup.
         facilitator_config: The facilitator config to use to create a client.
         storage_manager: The storage manager for payments.
-        webhook_url: The URL of the webhook to ping.
-        api_key: The API key for the webhook. Optional.
+        webhook_name: The name of the webhook.
         request_timeout: The timeout for requests.
-        webhook_timeout: The timeout for the webhook.
 
     Returns:
         The processed UUID for this payment, and (if applicable) the
@@ -82,7 +80,9 @@ async def process_payment(
         )
         send_payment_error = None
         try:
-            send_payment(webhook_url, settled_payment, api_key, webhook_timeout)
+            # TODO change this.
+            # send_payment(webhook_url, settled_payment, api_key, webhook_timeout)
+            pass
         except Exception as e:
             send_payment_error = e
         return payment_id, send_payment_error, response

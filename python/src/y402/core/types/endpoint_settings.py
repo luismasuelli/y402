@@ -70,20 +70,15 @@ class X402EndpointSettings(BaseModel):
     tags: Optional[List[str]] = Field(
         default=None, description="Arbitrary tags associated to this endpoint"
     )
-    webhook_url: str = Field(
-        description="The webhook URL for this payment endpoint. This is mandatory and per-endpoint"
+    webhook_name: str = Field(
+        description="The webhook name. It is an arbitrary string. Dispatch workers must pick "
+                    "payments with this value and batch-send them in order for any payment "
+                    "with this value to be sent to the webhook"
     )
-    api_key: Optional[str] = Field(
-        description="The API Key for this endpoint's webhook URL. This will provided as an "
-                    "Authorization: Bearer xxxx header. While this is an optional setting, it is "
-                    "highly recommended for it to be set. Populate this field from a secret setup "
-                    "like an environment variable or a read file's contents. Ensure the handler "
-                    "behind the webhook URL handles the incoming Authorization header in this "
-                    "way (Bearer xxx, where xxx is the final value in this field)"
-    )
-    request_timeout: Optional[int] = Field(
-        default=None, description="An optional timeout for webhook requests"
-    )
+    # A dispatch worker must run by specifying the same webhook_name and associating 3 options
+    # in order to effectively send the payments: webhook_url (absolute), api_key (optional -
+    # it will use "X-Api-Key: xxxx" if specified) and request_timeout (optional - if absent or
+    # less than 10 seconds it will become actually 10 seconds).
 
     def __call__(self, endpoint):
         setattr(endpoint, X402_ENDPOINT_SETTINGS, self)
