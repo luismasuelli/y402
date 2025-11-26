@@ -1,6 +1,12 @@
 pydantic==2.12.4
 eth-account==0.13.7
+## These are used to perform a request: httpx, httpx (sync), requests.
 # requests==2.32.5
 # httpx==0.28.1
+## These are used to serve the API: flask, fastapi.
 # Flask==3.1.2
 # fastapi==0.121.1
+## These ones are used for:
+## - Permanent payment storage: pymongo.
+## - Transient request storage: pymongo.
+# pymongo==4.15.4
