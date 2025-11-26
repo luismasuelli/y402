@@ -51,18 +51,3 @@ class StorageManager:
         """
 
         raise NotImplementedError
-
-    def rollback(self, collection: str, payment_id: uuid4):
-        """
-        Rollbacks a given payment id, meaning that the /settle endpoint failed.
-
-        This removal is synchronous.
-
-        The payment record will be removed.
-
-        Args:
-            collection: The collection to roll back the payment from.
-            payment_id: The id of the payment matching a stored one.
-        """
-
-        raise NotImplementedError

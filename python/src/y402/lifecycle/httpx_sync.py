@@ -53,10 +53,24 @@ async def process_payment(
         The processed UUID for this payment. Also, the settle response, if any.
     """
 
-    # 1. Create the facilitator config.
+    # 1. Prepare all the data for a settled payment. Do this in advance
+    #    so no failures are spotted later, on settling, on this topic.
+    payer = payment.payload.authorization.from_
+    network = payment.network
+    token = matched_requirements.asset
+    value = payment.payload.authorization.value
+    chain_id, code, name, price_label = setup.get_payment_data(network, token, value)
+    payment_id = uuid4()
+    settled_payment = create_settled_payment(
+        payment_id, resource, tags, reference,
+        payer, chain_id, token, value,
+        code, name, price_label
+    )
+
+    # 2. Create the facilitator config.
     facilitator_client = FacilitatorClient(facilitator_config)
 
-    # 2. Perform the verification.
+    # 3. Perform the verification.
     facilitator_client.verify(VerifyRequest(
         x402_version=X402_VERSION,
         payment_payload=payment,
@@ -64,35 +78,32 @@ async def process_payment(
         timeout=request_timeout
     ))
 
-    # 3. Store the verified payment.
-    payment_id = uuid4()
+    # 4. Store the verified payment. Done so, if the settlement
+    #    fails and the client complains that the authorization
+    #    was consumed, then the data is present for any claim.
+    #    Abusing this system would involve a decent amount of
+    #    gas consumption from the client, so very often this
+    #    will be legit.
     _forbid_awaitable(storage_manager.allocate(
         storage_collection, payment_id, payment, matched_requirements
     ), "allocate")
 
-    # 4. Settle the payment.
-    try:
-        response = facilitator_client.settle(SettleRequest(
-            x402_version=X402_VERSION,
-            payment_payload=payment,
-            payment_requirements=matched_requirements,
-            timeout=request_timeout
-        ))
-        if response.success:
-            payer = payment.payload.authorization.from_
-            network = payment.network
-            token = matched_requirements.asset
-            value = payment.payload.authorization.value
-            chain_id, code, name, price_label = setup.get_payment_data(network, token, value)
-            settled_payment = create_settled_payment(
-                payment_id, resource, tags, reference,
-                payer, chain_id, token, value,
-                code, name, price_label
-            )
-            _forbid_awaitable(storage_manager.commit(
-                storage_collection, payment_id, settled_payment, webhook_name
-            ), "commit")
-        return payment_id, response
-    except:
-        _forbid_awaitable(storage_manager.rollback(storage_collection, payment_id), "rollback")
-        raise
+    # 5. Settle the payment. By this point, the payment is consumed
+    #    and the corresponding record is marked as such.
+    response = facilitator_client.settle(SettleRequest(
+        x402_version=X402_VERSION,
+        payment_payload=payment,
+        payment_requirements=matched_requirements,
+        timeout=request_timeout
+    ))
+
+    # 6. Here, the response was successful in terms of HTTP (200)
+    #    and the settling was successful as well.
+    #
+    #    If the setting were not to be successful, then it would
+    #    not execute this point (committing the settlement).
+    if response.success:
+        _forbid_awaitable(storage_manager.commit(
+            storage_collection, payment_id, settled_payment, webhook_name
+        ), "commit")
+    return payment_id, response

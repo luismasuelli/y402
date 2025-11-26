@@ -79,18 +79,3 @@ class StorageManager(BaseStorageManager):
             {"payment_id": payment_id},
             {"$set": {"status": "settled", "settled_payment": settled_payment, "webhook_name": webhook_name}}
         )
-
-    def rollback(self, collection: str, payment_id: uuid4):
-        """
-        Rollbacks a given payment id, meaning that the /settle endpoint failed.
-
-        This removal is synchronous.
-
-        The payment record will be removed.
-
-        Args:
-            collection: The collection to roll back the payment from.
-            payment_id: The id of the payment matching a stored one.
-        """
-
-        self._database[collection].delete_one({"payment_id": payment_id})
