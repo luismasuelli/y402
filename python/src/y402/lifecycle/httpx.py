@@ -77,24 +77,27 @@ async def process_payment(
             payment_requirements=matched_requirements,
             timeout=request_timeout
         ))
-        await _maybe_await(storage_manager.commit(storage_collection, payment_id))
-        payer = payment.payload.authorization.from_
-        network = payment.network
-        token = matched_requirements.asset
-        value = payment.payload.authorization.value
-        chain_id, code, name, price_label = setup.get_payment_data(network, token, value)
-        settled_payment = create_settled_payment(
-            payment_id, resource, tags, reference,
-            payer, chain_id, token, value,
-            code, name, price_label
-        )
-        send_payment_error = None
-        try:
-            # TODO change this.
-            # await send_payment(webhook_url, settled_payment, api_key, webhook_timeout)
-            pass
-        except Exception as e:
-            send_payment_error = e
+        if response.success:
+            await _maybe_await(storage_manager.commit(storage_collection, payment_id))
+            payer = payment.payload.authorization.from_
+            network = payment.network
+            token = matched_requirements.asset
+            value = payment.payload.authorization.value
+            chain_id, code, name, price_label = setup.get_payment_data(network, token, value)
+            settled_payment = create_settled_payment(
+                payment_id, resource, tags, reference,
+                payer, chain_id, token, value,
+                code, name, price_label
+            )
+            send_payment_error = None
+            try:
+                # TODO change this.
+                # await send_payment(webhook_url, settled_payment, api_key, webhook_timeout)
+                pass
+            except Exception as e:
+                send_payment_error = e
+        else:
+            send_payment_error = None
         return payment_id, send_payment_error, response
     except:
         await _maybe_await(storage_manager.rollback(storage_collection, payment_id))
