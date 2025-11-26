@@ -116,7 +116,7 @@ def payment_required(
             mime_type_ = endpoint_data.mime_type or mime_type
             paywall_config_ = endpoint_data.paywall_config or paywall_config
             custom_paywall_html_ = endpoint_data.custom_paywall_html or custom_paywall_html
-            storage_collection = endpoint_data.storage_collection
+            storage_collection = endpoint_data.storage_collection.strip() or "payments"
 
             if storage_manager is None:
                 logger.error(f"Storage manager not defined")
