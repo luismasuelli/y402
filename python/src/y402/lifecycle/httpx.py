@@ -89,8 +89,6 @@ async def process_payment(
             await _maybe_await(storage_manager.commit(
                 storage_collection, payment_id, settled_payment, webhook_name
             ))
-        else:
-            send_payment_error = None
         return payment_id, response
     except:
         await _maybe_await(storage_manager.rollback(storage_collection, payment_id))

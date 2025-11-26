@@ -92,8 +92,6 @@ async def process_payment(
             _forbid_awaitable(storage_manager.commit(
                 storage_collection, payment_id, settled_payment, webhook_name
             ), "commit")
-        else:
-            send_payment_error = None
         return payment_id, response
     except:
         _forbid_awaitable(storage_manager.rollback(storage_collection, payment_id), "rollback")
