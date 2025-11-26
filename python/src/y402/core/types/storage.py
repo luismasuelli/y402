@@ -1,6 +1,7 @@
 from uuid import uuid4
 from ...core.types.client import PaymentPayload
 from ...core.types.requirements import PaymentRequirements
+from .payment import SettledPayment
 
 
 class StorageManager:
@@ -36,7 +37,7 @@ class StorageManager:
 
         raise NotImplementedError
 
-    def commit(self, collection: str, payment_id: uuid4):
+    def commit(self, collection: str, payment_id: uuid4, settled_payment: SettledPayment, webhook_name: str):
         """
         Confirms a given payment id, meaning that the /settle endpoint worked.
 
@@ -45,6 +46,8 @@ class StorageManager:
         Args:
             collection: The collection to commit / confirm the payment into.
             payment_id: The id of the payment matching a stored one.
+            settled_payment: The settled payment record.
+            webhook_name: The associated webhook name to use on launch.
         """
 
         raise NotImplementedError

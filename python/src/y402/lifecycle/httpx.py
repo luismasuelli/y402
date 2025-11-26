@@ -31,7 +31,7 @@ async def process_payment(
     webhook_name: str,
     # Tunings.
     request_timeout: int = 15
-) -> Tuple[uuid.UUID, Exception, SettleResponse]:
+) -> Tuple[uuid.UUID, SettleResponse]:
     """
     Processes a given payment.
 
@@ -49,9 +49,7 @@ async def process_payment(
         request_timeout: The timeout for requests.
 
     Returns:
-        The processed UUID for this payment, and (if applicable) the
-        error when notifying the webhook. Also, the settle response,
-        if any.
+        The processed UUID for this payment. Also, the settle response, if any.
     """
 
     # 1. Create the facilitator config.
@@ -78,7 +76,6 @@ async def process_payment(
             timeout=request_timeout
         ))
         if response.success:
-            await _maybe_await(storage_manager.commit(storage_collection, payment_id))
             payer = payment.payload.authorization.from_
             network = payment.network
             token = matched_requirements.asset
@@ -89,16 +86,12 @@ async def process_payment(
                 payer, chain_id, token, value,
                 code, name, price_label
             )
-            send_payment_error = None
-            try:
-                # TODO change this.
-                # await send_payment(webhook_url, settled_payment, api_key, webhook_timeout)
-                pass
-            except Exception as e:
-                send_payment_error = e
+            await _maybe_await(storage_manager.commit(
+                storage_collection, payment_id, settled_payment, webhook_name
+            ))
         else:
             send_payment_error = None
-        return payment_id, send_payment_error, response
+        return payment_id, response
     except:
         await _maybe_await(storage_manager.rollback(storage_collection, payment_id))
         raise

@@ -2,6 +2,7 @@ from uuid import uuid4
 from pymongo import MongoClient, HASHED
 from pymongo.collection import Collection
 from ..core.types.client import PaymentPayload
+from ..core.types.payment import SettledPayment
 from ..core.types.requirements import PaymentRequirements
 from ..core.types.storage import StorageManager as BaseStorageManager
 
@@ -48,7 +49,9 @@ class StorageManager(BaseStorageManager):
         collection_: Collection = self._database[collection]
 
         try:
-            collection_.create_index({"payment_id": HASHED})
+            collection_.create_index({"payment_id": HASHED}, unique=True)
+            collection_.create_index({"webhook_name": HASHED})
+            collection_.create_index({"status": HASHED})
         except:
             pass
 
@@ -59,7 +62,7 @@ class StorageManager(BaseStorageManager):
             "status": "verified"
         })
 
-    def commit(self, collection: str, payment_id: uuid4):
+    def commit(self, collection: str, payment_id: uuid4, settled_payment: SettledPayment, webhook_name: str):
         """
         Confirms a given payment id, meaning that the /settle endpoint worked.
 
@@ -68,11 +71,13 @@ class StorageManager(BaseStorageManager):
         Args:
             collection: The collection to commit / confirm the payment into.
             payment_id: The id of the payment matching a stored one.
+            settled_payment: The settled payment record.
+            webhook_name: The associated webhook name to use on launch.
         """
 
         self._database[collection].update_one(
             {"payment_id": payment_id},
-            {"$set": {"status": "settled"}}
+            {"$set": {"status": "settled", "settled_payment": settled_payment, "webhook_name": webhook_name}}
         )
 
     def rollback(self, collection: str, payment_id: uuid4):
