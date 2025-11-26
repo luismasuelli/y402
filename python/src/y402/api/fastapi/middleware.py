@@ -8,14 +8,14 @@ from .prices import compute_prices
 from .request_data import resolve_endpoint, get_root_url
 from .response_presets import x402_response, response
 from .types.endpoint_settings import X402EndpointSettings, Y402_ENDPOINT_SETTINGS
-from ..core.types.facilitator import FacilitatorConfig
-from ..core.types.paywall import PaywallConfig
-from ..core.types.registry import FinalEndpointSetupRegistry
-from ..core.types.requirements import FinalRequiredPaymentDetails, PaymentRequirements
-from ..core.types.setup import Y402Setup
-from ..core.types.storage import StorageManager
-from ..core.utils.headers import decode_payment_header, validate_payment_asset
-from ..core.utils.prices import PriceComputingError
+from ...core.types.facilitator import FacilitatorConfig
+from ...core.types.paywall import PaywallConfig
+from ...core.types.registry import FinalEndpointSetupRegistry
+from ...core.types.requirements import FinalRequiredPaymentDetails, PaymentRequirements
+from ...core.types.setup import Y402Setup
+from ...core.types.storage import StorageManager
+from ...core.utils.headers import decode_payment_header, validate_payment_asset
+from ...core.utils.prices import PriceComputingError
 
 
 logger = logging.getLogger(__name__)
@@ -212,7 +212,7 @@ def payment_required(
         # 10. Pick the proper payment processor adapter.
         match client_http_library:
             case "httpx":
-                from ..lifecycle.httpx import process_payment
+                from ...lifecycle.httpx import process_payment
             case _:
                 return x402_response(request, "Server not properly configured", custom_paywall_html_,
                                      paywall_config_, payment_requirements, chain_id_by_name)

@@ -1,8 +1,8 @@
 from typing import List, Callable
 from flask import Request
-from ..core.types.requirements import RequirePaymentDetails, FinalRequiredPaymentDetails
-from ..core.types.setup import Y402Setup
-from ..core.utils.prices import resolve_final_payment
+from ...core.types.requirements import RequirePaymentDetails, FinalRequiredPaymentDetails
+from ...core.types.setup import Y402Setup
+from ...core.utils.prices import resolve_final_payment
 
 
 def compute_prices(

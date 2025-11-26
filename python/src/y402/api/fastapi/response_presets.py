@@ -3,12 +3,12 @@ import json
 from typing import Optional, List, Dict
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse, HTMLResponse
-from ..core.types.facilitator import X402_VERSION
-from ..core.types.paywall import PaywallConfig
-from ..core.types.requirements import PaymentRequirements
-from ..core.types.responses import x402PaymentRequiredResponse
-from ..core.utils.headers import is_browser_request
-from ..core.utils.html import get_paywall_html
+from ...core.types.facilitator import X402_VERSION
+from ...core.types.paywall import PaywallConfig
+from ...core.types.requirements import PaymentRequirements
+from ...core.types.responses import x402PaymentRequiredResponse
+from ...core.utils.headers import is_browser_request
+from ...core.utils.html import get_paywall_html
 
 
 def response(

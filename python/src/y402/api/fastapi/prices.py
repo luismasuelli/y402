@@ -1,9 +1,9 @@
 import inspect
 from typing import List, Callable
 from fastapi import Request
-from ..core.types.requirements import RequirePaymentDetails, FinalRequiredPaymentDetails
-from ..core.types.setup import Y402Setup
-from ..core.utils.prices import resolve_final_payment
+from ...core.types.requirements import RequirePaymentDetails, FinalRequiredPaymentDetails
+from ...core.types.setup import Y402Setup
+from ...core.utils.prices import resolve_final_payment
 
 
 async def compute_prices(
