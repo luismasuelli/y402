@@ -24,7 +24,9 @@ async def process_payment(
     # User payment selection.
     payment: PaymentPayload, matched_requirements: PaymentRequirements,
     # External components.
-    setup: Y402Setup, facilitator_config: FacilitatorConfig, storage_manager: StorageManager,
+    setup: Y402Setup, facilitator_config: FacilitatorConfig,
+    # Storage.
+    storage_manager: StorageManager, storage_collection: str,
     # Webhook-related data.
     webhook_name: str,
     # Tunings.
@@ -42,6 +44,7 @@ async def process_payment(
         setup: An existing Y402 setup.
         facilitator_config: The facilitator config to use to create a client.
         storage_manager: The storage manager for payments.
+        storage_collection: The collection to store the payment into.
         webhook_name: The name of the webhook.
         request_timeout: The timeout for requests.
 
@@ -64,7 +67,7 @@ async def process_payment(
 
     # 3. Store the verified payment.
     payment_id = uuid4()
-    await _maybe_await(storage_manager.allocate(payment_id, payment, matched_requirements))
+    await _maybe_await(storage_manager.allocate(storage_collection, payment_id, payment, matched_requirements))
 
     # 4. Settle the payment.
     try:
@@ -74,7 +77,7 @@ async def process_payment(
             payment_requirements=matched_requirements,
             timeout=request_timeout
         ))
-        await _maybe_await(storage_manager.commit(payment_id))
+        await _maybe_await(storage_manager.commit(storage_collection, payment_id))
         payer = payment.payload.authorization.from_
         network = payment.network
         token = matched_requirements.asset
@@ -94,5 +97,5 @@ async def process_payment(
             send_payment_error = e
         return payment_id, send_payment_error, response
     except:
-        await _maybe_await(storage_manager.rollback(payment_id))
+        await _maybe_await(storage_manager.rollback(storage_collection, payment_id))
         raise

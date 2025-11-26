@@ -9,7 +9,8 @@ class StorageManager:
     the post-verified user payment requests.
     """
 
-    def allocate(self, payment_id: uuid4, payload: PaymentPayload, matched_requirements: PaymentRequirements):
+    def allocate(self, collection: str, payment_id: uuid4,
+                 payload: PaymentPayload, matched_requirements: PaymentRequirements):
         """
         Stores an authorization in 'verified' state. It tells the authorization
         (signed by the `from` sender) and the matched requirement. Ideally, the
@@ -27,6 +28,7 @@ class StorageManager:
         This allocation is synchronous.
 
         Args:
+            collection: The collection to store the payment into.
             payment_id: The id of the payment (generated on the fly).
             payload: The client payload fromm headers.
             matched_requirements: The matched requirements.
@@ -34,19 +36,20 @@ class StorageManager:
 
         raise NotImplementedError
 
-    def commit(self, payment_id: uuid4):
+    def commit(self, collection: str, payment_id: uuid4):
         """
         Confirms a given payment id, meaning that the /settle endpoint worked.
 
         This update is synchronous.
 
         Args:
+            collection: The collection to commit / confirm the payment into.
             payment_id: The id of the payment matching a stored one.
         """
 
         raise NotImplementedError
 
-    def rollback(self, payment_id: uuid4):
+    def rollback(self, collection: str, payment_id: uuid4):
         """
         Rollbacks a given payment id, meaning that the /settle endpoint failed.
 
@@ -55,6 +58,7 @@ class StorageManager:
         The payment record will be removed.
 
         Args:
+            collection: The collection to roll back the payment from.
             payment_id: The id of the payment matching a stored one.
         """
 

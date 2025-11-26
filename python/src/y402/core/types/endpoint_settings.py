@@ -70,6 +70,9 @@ class X402EndpointSettings(BaseModel):
                     "payments with this value and batch-send them in order for any payment "
                     "with this value to be sent to the webhook"
     )
+    storage_collection: str = Field(
+        description="The collection to store the payments into for this endpoint"
+    )
     # A dispatch worker must run by specifying the same webhook_name and associating 3 options
     # in order to effectively send the payments: webhook_url (absolute), api_key (optional -
     # it will use "X-Api-Key: xxxx" if specified) and request_timeout (optional - if absent or
