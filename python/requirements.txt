@@ -7,6 +7,5 @@ eth-account==0.13.7
 # Flask==3.1.2
 # fastapi==0.121.1
 ## These ones are used for:
-## - Permanent payment storage: pymongo.
-## - Transient request storage: pymongo.
+## - Payment & webhook request storage: pymongo.
 # pymongo==4.15.4
