@@ -1,3 +1,4 @@
+from typing import List
 from uuid import uuid4
 from pymongo import MongoClient, HASHED
 from pymongo.collection import Collection
@@ -84,3 +85,42 @@ class StorageManager(BaseStorageManager):
             {"payment_id": payment_id},
             {"$set": {"status": "settled"}}
         )
+
+    def batch_one(self, collection: str, webhook_name: str, worker_id: str, batch_size: int) -> bool:
+        """
+        Tries to find a non-batched record and batches it for the chosen
+        worker. The worker will make use of batched records later and then
+        proceed to do appropriate payments.
+
+        Args:
+            collection: The collection to batch a payment for a worker.
+            webhook_name: The name of the webhook the records must have
+                          to be batched by this method. Many workers may
+                          batch for the same webook name.
+            worker_id: The id of the worker to use for batching.
+            batch_size: The size of the batch to work with.
+
+        Returns:
+            Whether one record could be batched or not.
+        """
+
+        # TODO implement atomic batching.
+        raise NotImplementedError
+
+    def get_batch(self, collection: str, webhook_name: str, worker_id: str) -> List[SettledPayment]:
+        """
+        Returns the current batch of records for the given worker and webhook name.
+
+        Args:
+            collection: The collection to batch a payment for a worker.
+            webhook_name: The name of the webhook the records must have
+                          to be batched by this method. Many workers may
+                          batch for the same webook name.
+            worker_id: The id of the worker to use for batching.
+
+        Returns:
+            A list of the requests to send to that webhook.
+        """
+
+        # TODO implement atomic batching.
+        raise NotImplementedError
