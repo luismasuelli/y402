@@ -116,11 +116,9 @@ def payment_required(
             mime_type_ = endpoint_data.mime_type or mime_type
             paywall_config_ = endpoint_data.paywall_config or paywall_config
             custom_paywall_html_ = endpoint_data.custom_paywall_html or custom_paywall_html
-            storage_manager_ = endpoint_data.storage_manager or storage_manager
-            request_timeout_ = endpoint_data.request_timeout or request_timeout
 
-            if storage_manager_ is None:
-                logger.error(f"Storage manager not defined for resource {resource_url}")
+            if storage_manager is None:
+                logger.error(f"Storage manager not defined")
                 return response(
                     500, f"The resource {resource_url} is not properly configured",
                     custom_paywall_html_, paywall_config_, [], {}
@@ -253,7 +251,7 @@ def payment_required(
                 payment_id, error, settle_response = process_payment(
                     resource_url, endpoint_data.tags, reference, payment,
                     requirement, merged_setup, facilitator_config,
-                    storage_manager_, endpoint_data.webhook_name
+                    storage_manager, endpoint_data.webhook_name
                 )
                 if error:
                     lines = traceback.format_exception(error)
