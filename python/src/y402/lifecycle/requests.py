@@ -85,7 +85,8 @@ async def process_payment(
     #    gas consumption from the client, so very often this
     #    will be legit.
     _forbid_awaitable(storage_manager.allocate(
-        storage_collection, payment_id, payment, matched_requirements
+        storage_collection, payment_id, payment, matched_requirements,
+        settled_payment, webhook_name
     ), "allocate")
 
     # 5. Settle the payment. By this point, the payment is consumed
@@ -103,7 +104,7 @@ async def process_payment(
     #    If the setting were not to be successful, then it would
     #    not execute this point (committing the settlement).
     if response.success:
-        _forbid_awaitable(storage_manager.commit(
-            storage_collection, payment_id, settled_payment, webhook_name
+        _forbid_awaitable(storage_manager.settle(
+            storage_collection, payment_id
         ), "commit")
     return payment_id, response

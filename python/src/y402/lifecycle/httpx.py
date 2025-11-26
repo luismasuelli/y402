@@ -83,7 +83,8 @@ async def process_payment(
     #    Abusing this system would involve a decent amount of
     #    gas consumption from the client, so very often this
     #    will be legit.
-    await _maybe_await(storage_manager.allocate(storage_collection, payment_id, payment, matched_requirements))
+    await _maybe_await(storage_manager.allocate(storage_collection, payment_id, payment, matched_requirements,
+                                                settled_payment, webhook_name))
 
     # 5. Settle the payment. By this point, the payment is consumed
     #    and the corresponding record is marked as such.
@@ -100,7 +101,7 @@ async def process_payment(
     #    If the setting were not to be successful, then it would
     #    not execute this point (committing the settlement).
     if response.success:
-        await _maybe_await(storage_manager.commit(
-            storage_collection, payment_id, settled_payment, webhook_name
+        await _maybe_await(storage_manager.settle(
+            storage_collection, payment_id
         ))
     return payment_id, response

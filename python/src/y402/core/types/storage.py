@@ -11,7 +11,8 @@ class StorageManager:
     """
 
     def allocate(self, collection: str, payment_id: uuid4,
-                 payload: PaymentPayload, matched_requirements: PaymentRequirements):
+                 payload: PaymentPayload, matched_requirements: PaymentRequirements,
+                 settled_payment: SettledPayment, webhook_name: str):
         """
         Stores an authorization in 'verified' state. It tells the authorization
         (signed by the `from` sender) and the matched requirement. Ideally, the
@@ -33,11 +34,15 @@ class StorageManager:
             payment_id: The id of the payment (generated on the fly).
             payload: The client payload fromm headers.
             matched_requirements: The matched requirements.
+            settled_payment: The settled payment record. It will be sent
+                             via webhook after settlement.
+            webhook_name: The associated webhook name to use on launch
+                          after settlement.
         """
 
         raise NotImplementedError
 
-    def commit(self, collection: str, payment_id: uuid4, settled_payment: SettledPayment, webhook_name: str):
+    def settle(self, collection: str, payment_id: uuid4):
         """
         Confirms a given payment id, meaning that the /settle endpoint worked.
 
@@ -46,8 +51,6 @@ class StorageManager:
         Args:
             collection: The collection to commit / confirm the payment into.
             payment_id: The id of the payment matching a stored one.
-            settled_payment: The settled payment record.
-            webhook_name: The associated webhook name to use on launch.
         """
 
         raise NotImplementedError

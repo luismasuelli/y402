@@ -22,7 +22,8 @@ class StorageManager(BaseStorageManager):
         self._database = self._client[database]
 
     def allocate(self, collection: str, payment_id: uuid4,
-                 payload: PaymentPayload, matched_requirements: PaymentRequirements):
+                 payload: PaymentPayload, matched_requirements: PaymentRequirements,
+                 settled_payment: SettledPayment, webhook_name: str):
         """
         Stores an authorization in 'verified' state. It tells the authorization
         (signed by the `from` sender) and the matched requirement. Ideally, the
@@ -44,6 +45,10 @@ class StorageManager(BaseStorageManager):
             payment_id: The id of the payment (generated on the fly).
             payload: The client payload fromm headers.
             matched_requirements: The matched requirements.
+            settled_payment: The settled payment record. It will be sent
+                             via webhook after settlement.
+            webhook_name: The associated webhook name to use on launch
+                          after settlement.
         """
 
         collection_: Collection = self._database[collection]
@@ -59,10 +64,12 @@ class StorageManager(BaseStorageManager):
             "payment_id": payment_id,
             "payload": payload.model_dump(),
             "matched_requirements": matched_requirements.model_dump(),
-            "status": "verified"
+            "status": "verified",
+            "webhook_payload": settled_payment,
+            "webhook_name": webhook_name
         })
 
-    def commit(self, collection: str, payment_id: uuid4, settled_payment: SettledPayment, webhook_name: str):
+    def settle(self, collection: str, payment_id: uuid4):
         """
         Confirms a given payment id, meaning that the /settle endpoint worked.
 
@@ -71,11 +78,9 @@ class StorageManager(BaseStorageManager):
         Args:
             collection: The collection to commit / confirm the payment into.
             payment_id: The id of the payment matching a stored one.
-            settled_payment: The settled payment record.
-            webhook_name: The associated webhook name to use on launch.
         """
 
         self._database[collection].update_one(
             {"payment_id": payment_id},
-            {"$set": {"status": "settled", "settled_payment": settled_payment, "webhook_name": webhook_name}}
+            {"$set": {"status": "settled"}}
         )
