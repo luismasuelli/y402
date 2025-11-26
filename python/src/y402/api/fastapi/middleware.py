@@ -32,8 +32,7 @@ def payment_required(
     facilitator_config: Optional[FacilitatorConfig] = None,
     setup: Optional[FinalEndpointSetupRegistry] = None,
     client_http_library: Literal["httpx"] = "httpx",
-    storage_manager: Optional[StorageManager] = None,
-    request_timeout: int = 60
+    storage_manager: Optional[StorageManager] = None
 ):
     """
     This factory creates a middleware that performs the
@@ -51,7 +50,6 @@ def payment_required(
         storage_manager: The default storage manager. If not set, it must set on each of the endpoints
                          configured to be Y402-defined. Storage managers are used to store the requested
                          and paid-for jobs.
-        request_timeout: The timeout for the webhook requests.
 
     Returns:
         A middleware function.
