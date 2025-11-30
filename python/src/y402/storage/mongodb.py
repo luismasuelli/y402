@@ -1,4 +1,5 @@
-from typing import List
+import datetime
+from typing import List, Union
 from uuid import uuid4
 from pymongo import MongoClient, HASHED
 from pymongo.collection import Collection
@@ -8,12 +9,16 @@ from ..core.types.requirements import PaymentRequirements
 from ..core.types.storage import StorageManager as BaseStorageManager
 
 
+_BS = 50
+_BE = 60
+
+
 class StorageManager(BaseStorageManager):
     """
     A MongoDB-based storage manager.
     """
 
-    def __init__(self, url: str, database: str):
+    def __init__(self, url: str, database: str, batch_expiration: int = _BE, batch_size: int = _BS):
         url = url.strip()
         database = database.strip()
         if not url or not database:
@@ -21,6 +26,9 @@ class StorageManager(BaseStorageManager):
                              "MongoDB-based StorageManager")
         self._client = MongoClient(url)
         self._database = self._client[database]
+        self._batch_expiration = max(_BE, batch_expiration) if isinstance(batch_expiration, int) else _BE
+        self._batch_expiration_delta = datetime.timedelta(seconds=self._batch_expiration)
+        self._batch_size = max(_BS, batch_size) if isinstance(batch_size, int) else _BS
 
     def allocate(self, collection: str, payment_id: uuid4,
                  payload: PaymentPayload, matched_requirements: PaymentRequirements,
@@ -86,7 +94,8 @@ class StorageManager(BaseStorageManager):
             {"$set": {"status": "settled"}}
         )
 
-    def batch_one(self, collection: str, webhook_name: str, worker_id: str, batch_size: int) -> bool:
+    def _batch_one(self, collection: str, webhook_name: str, worker_id: str,
+                   stamp: datetime.datetime) -> bool:
         """
         Tries to find a non-batched record and batches it for the chosen
         worker. The worker will make use of batched records later and then
@@ -98,14 +107,24 @@ class StorageManager(BaseStorageManager):
                           to be batched by this method. Many workers may
                           batch for the same webook name.
             worker_id: The id of the worker to use for batching.
-            batch_size: The size of the batch to work with.
+            stamp: The pivot stamp to compute the date.
 
         Returns:
             Whether one record could be batched or not.
         """
 
-        # TODO implement atomic batching.
-        raise NotImplementedError
+        min_date = stamp - self._batch_expiration_delta
+        result = self._database[collection].find_one_and_update({
+            "status": "settled",
+            "webhook_name": webhook_name,
+            "$or": [
+                {"batched_on": {"$exists": False}},
+                {"batched_on": {"lte": min_date}},
+                {"worker": {"$exists": False}},
+                {"worker": {"$in": ["", None]}},
+            ]
+        }, {"$set": {"worker": worker_id, "batched_on": stamp}})
+        return result is not None
 
     def get_batch(self, collection: str, webhook_name: str, worker_id: str) -> List[SettledPayment]:
         """
@@ -122,5 +141,40 @@ class StorageManager(BaseStorageManager):
             A list of the requests to send to that webhook.
         """
 
-        # TODO implement atomic batching.
-        raise NotImplementedError
+        # 1. Get the batch size and limit stamps.
+        batch_size = self._batch_size
+        stamp = datetime.datetime.now(tz=datetime.UTC)
+        min_date = stamp - self._batch_expiration_delta
+
+        # 2. Batch remaining items.
+        count = self._database[collection].count_documents({
+            "status": "settled",
+            "webhook_name": webhook_name,
+            "worker": worker_id,
+            "batched_on": {"gt": min_date}
+        })
+        if batch_size < count:
+            for _ in range(count - batch_size):
+                self._batch_one(collection, webhook_name, worker_id, stamp)
+
+        # 3. Return the records.
+        return list(self._database[collection].find({
+            "status": "settled",
+            "webhook_name": webhook_name,
+            "worker": worker_id,
+            "batched_on": {"gt": min_date}
+        }))
+
+    def mark_as_sent(self, collection: str, payment_id: Union[str, uuid4]):
+        """
+        Marks a payment as webhook-sent.
+
+        Args:
+            collection: The collection to mark a payment into.
+            payment_id: The payment id.
+        """
+
+        self._database[collection].update_one({
+            "status": "settled",
+            "payment_id": str(payment_id)
+        }, {"status": "finished"})

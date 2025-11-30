@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from uuid import uuid4
 from ...core.types.client import PaymentPayload
 from ...core.types.requirements import PaymentRequirements
@@ -89,6 +89,17 @@ class StorageManager:
 
         Returns:
             A list of the requests to send to that webhook.
+        """
+
+        raise NotImplementedError
+
+    def mark_as_sent(self, collection: str, payment_id: Union[str, uuid4]):
+        """
+        Marks a payment as webhook-sent.
+
+        Args:
+            collection: The collection to mark a payment into.
+            payment_id: The payment id.
         """
 
         raise NotImplementedError
