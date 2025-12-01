@@ -9,7 +9,6 @@ from ..core.types.setup import Y402Setup
 from ..core.types.storage import StorageManager
 from ..facilitator_client.httpx import FacilitatorClient
 from ..lifecycle.utils import create_settled_payment
-from ..triggers.httpx import send_payment
 
 
 async def _maybe_await(result: Any) -> Any:

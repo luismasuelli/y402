@@ -9,7 +9,6 @@ from ..core.types.setup import Y402Setup
 from ..core.types.storage import StorageManager
 from ..facilitator_client.httpx_sync import FacilitatorClient
 from ..lifecycle.utils import create_settled_payment
-from ..triggers.httpx_sync import send_payment
 
 
 def _forbid_awaitable(result: Any, method: str) -> Any:
