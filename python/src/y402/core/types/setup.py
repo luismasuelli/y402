@@ -146,7 +146,7 @@ class Y402Setup:
         network, code = self._check_network_and_code(network, code)
         token = self._networks[network]["tokens"][code]
         symbol = token["symbol"]
-        self._default_tokens[network][symbol] = code
+        self._default_tokens.setdefault(network, {})[symbol] = code
 
     def set_default_token(self, network: str, code: str):
         """
