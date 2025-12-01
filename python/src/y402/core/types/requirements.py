@@ -1,4 +1,4 @@
-from typing import Optional, Any, Union
+from typing import Optional, Any, Union, Literal
 import re
 from pydantic import BaseModel, Field, ConfigDict, field_validator
 from pydantic.alias_generators import to_camel
@@ -49,7 +49,7 @@ class RequirePaymentDetails(BaseModel):
     for an endpoint in particular.
     """
 
-    scheme: str = Field(description="The scheme", default="exact")
+    scheme: Literal["exact"] = Field(description="The scheme", default="exact")
     network: str = Field(
         description="The human name of the network (e.g. ethereum, ethereum-sepolia, "
                     "base, base-sepolia, avalanche, avalanche-fuji)"
