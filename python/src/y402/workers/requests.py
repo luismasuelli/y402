@@ -3,7 +3,7 @@ import logging
 import threading
 import time
 from typing import Any, List
-from httpx import Client
+from requests import Session
 from ..core.types.payment import SettledPayment
 from ..core.types.storage import StorageManager
 
@@ -38,9 +38,9 @@ def _send_batch(
         logger: An optional logger.
     """
 
-    def _send(client: Client, payload: SettledPayment):
+    def _send(session: Session, payload: SettledPayment):
         try:
-            client.post(url=webhook_url, headers=headers, json=payload.model_dump(mode="json"))
+            session.post(url=webhook_url, headers=headers, json=payload.model_dump(mode="json"), timeout=15)
             _forbid_awaitable(manager.mark_as_sent(collection, element.id_), "mark_as_sent")
         except:
             logger.exception(f"An exception occurred when processing payment with id={payload.id_}")
@@ -52,12 +52,13 @@ def _send_batch(
     batch: List[SettledPayment] = _forbid_awaitable(manager.get_batch(collection, webhook_name, worker_id),
                                                     "get_batch")
     logger.info("- Sending the batch...")
-    with Client(timeout=15) as client:
-        threads = [threading.Thread(target=lambda: _send(client, payload)) for payload in batch]
-        for thread in threads:
-            thread.start()
-        for thread in threads:
-            thread.join()
+    session = Session()
+
+    threads = [threading.Thread(target=lambda: _send(session, payload)) for payload in batch]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
     logger.info("- Updating the batch...")
     for element in batch:
         manager.mark_as_sent(collection, element.id_)
