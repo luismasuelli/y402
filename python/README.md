@@ -189,6 +189,7 @@ app = Flask(...)
 
 # Create the decorator (centralized instantiation):
 require_payment = payment_required(
+    # The MIME type to use by default.
     mime_type="application/json",  # Optional; default value.
     # The max. time the client can take to answer this
     # request and provide the payment.
@@ -215,4 +216,207 @@ require_payment = payment_required(
     # This is MANDATORY.
     storage_manager=storage_manager
 )
+```
+
+The same @require_payment operator can be used multiple times.
+
+In order to use this in a Flask endpoint (this decorator is used endpoint-wise):
+
+```python
+from y402.api.flask.types.endpoint_settings import X402EndpointSettings
+from y402.core.types.schema import HTTPInputSchema
+
+
+@app.route(...flask-related setup...)
+...
+@require_payment
+@X402EndpointSettings(
+    # The canonical URL to use for to-client documentation
+    # in the x402 protocol response message. Optional. If
+    # absent, the same request's URL will be used.
+    resource_url=None,
+    # The path parameter, present in the URL for this endpoint,
+    # from which the reference argument will be extracted. It
+    # must match an existing path parameter in the URL, or an
+    # error / None value will occur. If not specified, then
+    # the reference will be None for payments of this endpoint,
+    # which might not be a good idea. So it's always better
+    # to specify a valid reference_param for this endpoint.
+    reference_param=None,
+    # The description of the endpoint. Optional.
+    description="This endpoint does ...",
+    # The time, in seconds, that a client can take to perform
+    # the signing of the payment before it needs to start the
+    # x402 exchange again.
+    max_deadline_seconds=60,
+    # An optional schema, of type HTTPInputSchema, to use
+    # to hint the clients about the format of the expected
+    # input (path params, query params, headers and body).
+    # Useful for the agents reading the result and understanding.
+    # Not needed if the app is client-only.
+    input_schema=None,
+    # A description of the output schema (a mapping field =>
+    # description). Meant to be used to tell agents what to
+    # expect. Only useful for agents. Optional.
+    output_schema=None,
+    # A different MIME type to use, rather than the one
+    # configured in the @require_payment decorator.
+    # Optional.
+    mime_type=None,
+    # A different paywall config instance to use, rather
+    # than the one configured in the @require_payment
+    # decorator. Optional.
+    paywall_config=None,  # Or a paywall config instance.
+    # A different HTML endpoint to use, rather than the one
+    # configured in the @require_payment decorator. Optional.
+    custom_paywall_html=None,  # Or a new HTML content.
+    # A custom setup to merge to the existing setup, if present.
+    # Optional.
+    custom_setup=None,  # Or a Y402Setup instance.
+    # Arbitrary custom tags to add to this endpoint's payments.
+    # Optional.
+    tags=["some", "tags"],
+    # The name of the webhook that will receive the payments
+    # that were settled in this endpoint. Mandatory.
+    webhook_name="some_webhook_name",
+    # The collection where the storage manager will maintain
+    # payments for this endpoint. Mandatory.
+    storage_collection="some_collection",
+    # The details of the payment.
+    payments_details=...
+)
+def my_endpoint(...flask-related parameters...):
+    # this is regular Flask endpoint code.
+    # By this point in code execution, the payment has been processed
+    # and queued for notification to the webhook.
+    return ...
+```
+
+The `payment_details` is **mandatory** and can be:
+
+1. A list of `x402.core.types.requirements.RequirePaymentDetails` objects.
+2. A callable taking the current `Request` object and returning, synchronously or via awaitables,
+   a list of `x402.core.types.requirements.RequirePaymentDetails` objects.
+
+The `RequirePaymentDetails` accepts:
+
+1. A `scheme`. Typically, `exact`. The only one implemented in this library, so far.
+2. A `network` among the registered ones in the setup. It is in practice mandatory that
+   either the setup in the centralized decorator or the endpoint decorator define the
+   network and tokens to be used here.
+3. A `pay_to_address` address that will receive the payment via x402 protocol.
+4. A `price` which can be an integer (expressed in the minimal units of whatever token
+   is set as per-network default using `.set_default_token` in the setup for the given
+   network; otherwise, an error will occur), a string (in this case, the per-network
+   per-symbol token will be used for values like $12.34, @12.34 or whatever symbol is
+   being used; an error will occur on unknown symbol or mismatch, otherwise the number
+   will be multiplied by the decimals factor, rounded to integer, and used as the value
+   for the corresponding token) or a direct `y402.core.types.requirements.TokenAmount`
+   instance.
+
+In the case of a `TokenAmount` instance, it takes these arguments:
+
+1. `amount` as integer, in terms of its intended minimal units.
+2. `asset` as `TokenAsset` (same module / package).
+
+In turn, `TokenAsset` takes these arguments:
+
+1. `address` is the address of the token contract.
+2. `decimals` is the amount of decimals it returns on its `.decimals()` method.
+3. `eip712` is the mandatory `y402.core.types.eip712.EIP712Domain` instance.
+
+Finally, `EIP712Domain` takes these arguments:
+
+1. `name` is the EIP-712 name of the contract's domain.
+2. `version` is the EIP-712 version of the contract's domain.
+
+### Using FastAPI as server
+
+The setup is similar to Flask's but with some remarks:
+
+1. No central decorator here. It's used as a middleware instead.
+2. The callable accepted in `payments_details=`, if using a callable, accepts the
+   request as a FastAPI's `Request` object.
+
+Creating the middleware is done like this:
+
+```python
+from fastapi import FastAPI
+from y402.api.fastapi.middleware import payment_required
+from y402.core.types.facilitator import FacilitatorConfig
+
+storage_manager = ... # Same as in Flask's.
+
+app = FastAPI(title=...)
+app.middleware("http")(
+    payment_required(
+        # Notice how the arguments are the same as in Flask's.
+
+        # The MIME type to use by default.
+        mime_type="application/json",  # Optional; default value.
+        # The max. time the client can take to answer this
+        # request and provide the payment.
+        default_max_deadline_seconds=60,  # Optional; default value.
+        # Coinbase Developer Platform paywall configuration.
+        paywall_config=None,  # Optional; default value.
+        # Custom HTML paywall when using HTML responses.
+        # If None, it uses a default paywall renderer.
+        custom_paywall_html=None,  # Optional; default value.
+        # The config to use for the facilitator client. If not given,
+        # the facilitator will use https://x402.org/facilitator, which
+        # needs no particular auth. headers. Otherwise, it can make
+        # use of fields url="https://..." (a full URL to a POST URL)
+        # and optional headers={...a dictionary...}.
+        facilitator_config=FacilitatorConfig(),  # Optional; default value.
+        # Only httpx is allowed as a library.
+        client_http_library="httpx",  # Optional; default value.
+        # The setup defined in the earlier point. If this setup is None,
+        # then the only setup that will be considered is taken from the
+        # endpoint being processed. If the endpoint does not define its
+        # setup, and empty setup is used.
+        setup=setup,  # Optional; default value can safely be None.
+        # The storage manager defined in the earlier point.
+        # This is MANDATORY.
+        storage_manager=storage_manager
+    )
+)
+
+# Include the routers here...
+app.include_router(...)
+```
+
+Then, in the routers, ensure to have this structure:
+
+```python
+from fastapi import APIRouter, ...
+from y402.api.fastapi.types.endpoint_settings import X402EndpointSettings
+from y402.core.types.schema import HTTPInputSchema
+
+
+router = APIRouter()
+
+
+@X402EndpointSettings(
+   # These are the same arguments as Flask's X402EndpointSettings.
+   #
+   # The only difference is the explained on in payments_details=.
+   resource_url="/the/url",  # or /the/url/{reference}
+   description="Accepts a payload bla bla bla...",
+   # max_deadline_seconds=60,
+   input_schema=HTTPInputSchema(
+      # query_params={ ... },
+      # header_fields={},
+      body_type="json",
+      body_fields=...
+   ),
+   output_schema={"foo": "Some foo field", ...},
+   mime_type="application/json",
+   payments_details=...
+)
+@router.post("/the/url", ...)
+async def endpoint(...):
+    # Define it as normal in FastAPI. Return arbitrary values as normal.
+    # By this point in code execution, the payment has been processed
+    # and queued for notification to the webhook.
+    return ...
 ```
