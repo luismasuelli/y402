@@ -1,5 +1,4 @@
 import base64
-import traceback
 from typing import Callable, Optional, List, Literal
 import logging
 from fastapi import Request, HTTPException
@@ -84,7 +83,7 @@ def payment_required(
         max_deadline_seconds = endpoint_data.max_deadline_seconds or default_max_deadline_seconds
         output_schema = endpoint_data.output_schema
         input_schema = endpoint_data.input_schema
-        mime_type_ = endpoint_data.mime_type or mime_type
+        mime_type_ = endpoint_data.mime_type or mime_type or "application/json"
         paywall_config_ = endpoint_data.paywall_config or paywall_config
         custom_paywall_html_ = endpoint_data.custom_paywall_html or custom_paywall_html
         storage_collection = endpoint_data.storage_collection.strip() or "payments"
