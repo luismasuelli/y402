@@ -104,6 +104,6 @@ async def process_payment(
     #    not execute this point (committing the settlement).
     if response.success:
         _forbid_awaitable(storage_manager.settle(
-            storage_collection, payment_id
+            storage_collection, payment_id, response.transaction
         ), "commit")
     return payment_id, response

@@ -53,6 +53,5 @@ def create_settled_payment(
             code=code,
             name=name,
             price_label=price_label,
-        ),
-        settled_on=datetime.datetime.now(tz=datetime.timezone.utc)
+        )
     )

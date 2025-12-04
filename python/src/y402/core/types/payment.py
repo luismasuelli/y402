@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from pydantic import Field, BaseModel
 
 
@@ -74,9 +74,10 @@ class SettledPayment(BaseModel):
     details: PaymentDetails = Field(
         description="The details of the payment (token, network, ...)"
     )
-    settled_on: datetime = Field(
+    settled_on: Optional[datetime] = Field(
         description="The time this payment was settled on"
     )
-    transaction_hash: str = Field(
+    transaction_hash: Optional[str] = Field(
+        default=None,
         description="The 0x-prefixed transaction hash"
     )

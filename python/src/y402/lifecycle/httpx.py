@@ -101,6 +101,6 @@ async def process_payment(
     #    not execute this point (committing the settlement).
     if response.success:
         await _maybe_await(storage_manager.settle(
-            storage_collection, payment_id
+            storage_collection, payment_id, response.transaction
         ))
     return payment_id, response
