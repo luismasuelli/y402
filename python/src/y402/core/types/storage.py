@@ -43,7 +43,7 @@ class StorageManager:
 
         raise NotImplementedError
 
-    def settle(self, collection: str, payment_id: uuid4):
+    def settle(self, collection: str, payment_id: uuid4, transaction: str):
         """
         Confirms a given payment id, meaning that the /settle endpoint worked.
 
@@ -52,6 +52,7 @@ class StorageManager:
         Args:
             collection: The collection to settle the payment into.
             payment_id: The id of the payment matching a stored one.
+            transaction: The hash of the transaction.
         """
 
         raise NotImplementedError

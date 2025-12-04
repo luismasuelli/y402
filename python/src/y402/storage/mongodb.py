@@ -75,10 +75,11 @@ class StorageManager(BaseStorageManager):
             "matched_requirements": matched_requirements.model_dump(),
             "status": "verified",
             "webhook_payload": settled_payment,
-            "webhook_name": webhook_name
+            "webhook_name": webhook_name,
+            "created_on": datetime.datetime.now(tz=datetime.UTC)
         })
 
-    def settle(self, collection: str, payment_id: uuid4):
+    def settle(self, collection: str, payment_id: uuid4, transaction: str):
         """
         Confirms a given payment id, meaning that the /settle endpoint worked.
 
@@ -87,11 +88,16 @@ class StorageManager(BaseStorageManager):
         Args:
             collection: The collection to commit / confirm the payment into.
             payment_id: The id of the payment matching a stored one.
+            transaction: The hash of the transaction.
         """
 
         self._database[collection].update_one(
             {"payment_id": payment_id},
-            {"$set": {"status": "settled"}}
+            {"$set": {
+                "status": "settled",
+                "webhook_payload.transaction_hash": transaction,
+                "webhook_payload.settled_on": datetime.datetime.now(tz=datetime.UTC)
+            }}
         )
 
     def _batch_one(self, collection: str, webhook_name: str, worker_id: str,
