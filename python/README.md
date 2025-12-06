@@ -89,7 +89,9 @@ Mounting a server depends on three things:
 The first point, however, is defining an optional setup if more things are
 needed. This setup must be analogous between the client and the server (i.e.
 in the same way the client defined its `chain_id_by_name`, if used, the setup
-must configure the same networks but in its own format).
+must configure the same networks but in its own format - this can be skipped
+if it's only expected for the client to use the same y402 client instead of an
+arbitrary x402 client for some reason).
 
 Creating a setup looks like this:
 
@@ -420,3 +422,7 @@ async def endpoint(...):
     # and queued for notification to the webhook.
     return ...
 ```
+
+## Usage (endpoint dispatcher)
+
+### Understanding endpoints
