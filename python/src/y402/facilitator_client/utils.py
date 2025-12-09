@@ -18,6 +18,8 @@ def make_headers(headers: FacilitatorHeaders, endpoint: Literal["settle", "verif
     """
 
     stuff = headers.get(endpoint, {})
+    if not stuff:
+        return {}
     if isinstance(stuff, dict):
         return stuff
     else:  # callable

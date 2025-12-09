@@ -1,4 +1,5 @@
 import base64
+import inspect
 from typing import Callable, Optional, List, Literal
 import logging
 from fastapi import Request, HTTPException
@@ -29,8 +30,8 @@ def payment_required(
     paywall_config: Optional[PaywallConfig] = None,
     custom_paywall_html: Optional[str] = None,
     facilitator_config: Optional[FacilitatorConfig] = None,
-    setup: Optional[FinalEndpointSetupRegistry] = None,
-    client_http_library: Literal["httpx"] = "httpx",
+    setup: Optional[Y402Setup] = None,
+    client_http_library: Literal["httpx", "httpx_sync", "requests"] = "httpx",
     storage_manager: Optional[StorageManager] = None
 ):
     """
@@ -211,17 +212,24 @@ def payment_required(
         match client_http_library:
             case "httpx":
                 from ...lifecycle.httpx import process_payment
+            case "httpx_sync":
+                from ...lifecycle.httpx_sync import process_payment
+            case "requests":
+                from ...lifecycle.requests import process_payment
             case _:
                 return x402_response(request, "Server not properly configured", custom_paywall_html_,
                                      paywall_config_, payment_requirements, chain_id_by_name)
 
         # 11. Actually process the payment.
         try:
-            payment_id, settle_response = await process_payment(
+            result = await process_payment(
                 resource_url, endpoint_data.tags, reference, payment,
                 requirement, merged_setup, facilitator_config,
                 storage_manager, storage_collection, endpoint_data.webhook_name
             )
+            if inspect.isawaitable(result):
+                result = await result
+            payment_id, settle_response = result
             if not settle_response.success:
                 return x402_response(request, "Settle failed: " + (settle_response.error_reason or "Unknown error"),
                                      custom_paywall_html_, paywall_config_, payment_requirements,

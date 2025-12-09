@@ -1,3 +1,4 @@
+import traceback
 from ..types.errors import MisconfigurationError
 from ..types.requirements import FinalRequiredPaymentDetails, RequirePaymentDetails, Price, TokenAmount
 from ..types.setup import Y402Setup
@@ -25,12 +26,22 @@ def _resolve_payment_price(
     network: str, price: Price, setup: Y402Setup
 ):
     if isinstance(price, str):
-        return setup.parse_price_label(network, price)
+        try:
+            code, amount = setup.parse_price_label(network, price)
+            name, _, address, version, _ = setup.get_token_metadata(network, code)
+            return amount, address, {"name": name, "version": version}
+        except Exception:
+            traceback.print_exc()
+            raise PriceComputingError("There was an error while computing a price from string")
     elif isinstance(price, int):
         code = setup.get_default_token(network)
         if code is None:
             raise MisconfigurationError(f"The network {network} does not have a default token")
-        name, _, address, version, _ = setup.get_token_metadata(network, code)
+        try:
+            name, _, address, version, _ = setup.get_token_metadata(network, code)
+        except Exception:
+            traceback.print_exc()
+            raise PriceComputingError("There was an error while computing a price from int")
         return price, address, {"name": name, "version": version}
     elif isinstance(price, TokenAmount):
         # TokenAmount type - already in atomic units with asset info.

@@ -74,10 +74,14 @@ class RequirePaymentDetails(BaseModel):
         if not isinstance(v, (str, int, TokenAmount)):
             has_allowed_type = False
         if isinstance(v, str):
-            if v[0] == '$':
-                v = v[1:]
+            v = v.strip()
+
+            if v[0] not in '0123456789.':
+                v_ = v[1:]
+            else:
+                v_ = v
             try:
-                if float(v) < 0:
+                if float(v_) < 0:
                     raise Exception()
             except:
                 has_allowed_type = False

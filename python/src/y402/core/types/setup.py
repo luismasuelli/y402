@@ -1,10 +1,11 @@
 from typing import Tuple, Optional, List, Dict
 from decimal import Decimal
+from pydantic import BaseModel
 from .errors import MisconfigurationError
 from .default_data import KNOWN_NETWORKS_AND_TOKENS
 
 
-class Y402Setup:
+class Y402Setup(BaseModel):
     """
     A setup tells in a set of internal mappings:
 
@@ -12,9 +13,13 @@ class Y402Setup:
     - The tokens in those networks.
     """
 
-    def __init__(self):
-        self._networks = {}
-        self._default_tokens = {}
+    _networks: Optional[dict] = None
+    _default_tokens: Optional[dict] = None
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._networks = self._networks or {}
+        self._default_tokens = self._default_tokens or {}
 
     def add_network(self, network: str, chain_id: int = 0):
         """
@@ -174,6 +179,8 @@ class Y402Setup:
             The default token code of that network.
         """
 
+        if network not in self._networks:
+            return None
         return self._networks[network]["default_token"]
 
     def _get_price_label(self, value: str, decimals: int, symbol: str):
@@ -244,7 +251,7 @@ class Y402Setup:
         if token not in self._networks[network]["tokens_by_address"]:
             raise MisconfigurationError(f"Use a valid code for the token")
         code = self._networks[network]["tokens_by_address"][token]
-        token_data = self._networks[network]["tokens"]
+        token_data = self._networks[network]["tokens"][code]
         decimals = token_data["decimals"]
         name = token_data["name"]
         chain_id = self._networks[network]["chain_id"]
@@ -286,7 +293,7 @@ class Y402Setup:
             label: The label to parse.
 
         Returns:
-            The parsed token price, as (asset address, amount).
+            The parsed token price, as (asset code, amount).
         """
 
         label = label.strip()
@@ -302,7 +309,6 @@ class Y402Setup:
             raise MisconfigurationError(f"The symbol '{symbol}' is not default-registered in network: {network}")
         code = self._default_tokens[network][symbol]
         token_data = self._networks[network]["tokens"][code]
-        token = token_data["address"]
         decimals = token_data["decimals"]
 
         # 2. Parse the price and multiply by decimals to get the amount.
@@ -314,8 +320,8 @@ class Y402Setup:
         except:
             raise MisconfigurationError(f"The price '{price} is not a valid amount")
 
-        # 3. Return both.
-        return token, amount
+        # 3. Return the token code and the amount.
+        return code, amount
 
     def __or__(self, other: 'Y402Setup'):
         """

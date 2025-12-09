@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/js/js.iml" filepath="$PROJECT_DIR$/js/js.iml" />
       <module fileurl="file://$PROJECT_DIR$/python/python.iml" filepath="$PROJECT_DIR$/python/python.iml" />
+      <module fileurl="file://$PROJECT_DIR$/examples/python/python.iml" filepath="$PROJECT_DIR$/examples/python/python.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/y402.iml" filepath="$PROJECT_DIR$/.idea/y402.iml" />
     </modules>
   </component>

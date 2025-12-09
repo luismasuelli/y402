@@ -75,6 +75,7 @@ class SettledPayment(BaseModel):
         description="The details of the payment (token, network, ...)"
     )
     settled_on: Optional[datetime] = Field(
+        default=None,
         description="The time this payment was settled on"
     )
     transaction_hash: Optional[str] = Field(

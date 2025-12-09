@@ -31,8 +31,8 @@ def payment_required(
     paywall_config: Optional[PaywallConfig] = None,
     custom_paywall_html: Optional[str] = None,
     facilitator_config: Optional[FacilitatorConfig] = None,
-    setup: Optional[FinalEndpointSetupRegistry] = None,
-    client_http_library: Literal["httpx"] = "httpx",
+    setup: Optional[Y402Setup] = None,
+    client_http_library: Literal["httpx_sync", "requests"] = "httpx_sync",
     storage_manager: Optional[StorageManager] = None
 ):
     """
@@ -236,7 +236,7 @@ def payment_required(
 
             # 10. Pick the proper payment processor adapter.
             match client_http_library:
-                case "httpx":
+                case "httpx_sync":
                     from ...lifecycle.httpx_sync import process_payment
                 case "requests":
                     from ...lifecycle.requests import process_payment

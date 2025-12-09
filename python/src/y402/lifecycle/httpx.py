@@ -70,9 +70,9 @@ async def process_payment(
 
     # 3. Perform the verification.
     await facilitator_client.verify(VerifyRequest(
-        x402_version=X402_VERSION,
-        payment_payload=payment,
-        payment_requirements=matched_requirements,
+        x402Version=X402_VERSION,
+        paymentPayload=payment,
+        paymentRequirements=matched_requirements,
         timeout=request_timeout
     ))
 
@@ -88,9 +88,9 @@ async def process_payment(
     # 5. Settle the payment. By this point, the payment is consumed
     #    and the corresponding record is marked as such.
     response = await facilitator_client.settle(SettleRequest(
-        x402_version=X402_VERSION,
-        payment_payload=payment,
-        payment_requirements=matched_requirements,
+        x402Version=X402_VERSION,
+        paymentPayload=payment,
+        paymentRequirements=matched_requirements,
         timeout=request_timeout
     ))
 

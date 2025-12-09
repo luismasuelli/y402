@@ -135,10 +135,10 @@ setup.add_token("base", "usdc")
 # (assuming base network is added)
 setup.add_token(
     "base", "my_token",
-    "The Token Name",  # The EIP-712 name of the token contract.
+    "The Token Name",     # The EIP-712 name of the token contract.
     "0xTheTokenAddress",  # The address of the token contract.
-    1,  # The EIP-712 version of the token contract.
-    18,  # The return value of .decimals() of the token contract.
+    "1",  # The EIP-712 version of the token contract.
+    18,   # The return value of .decimals() of the token contract.
     "@",  # The symbol we'll associate for the token. This will
           # be explained later.
     default_for_symbol=True,  # Optional (by default: False). It
@@ -207,8 +207,8 @@ require_payment = payment_required(
     # use of fields url="https://..." (a full URL to a POST URL)
     # and optional headers={...a dictionary...}.
     facilitator_config=FacilitatorConfig(),  # Optional; default value.
-    # Only httpx is allowed as a library.
-    client_http_library="httpx",  # Optional; default value.
+    # Only httpx_sync / requests is allowed as a library  for Flask.
+    client_http_library="httpx_sync",  # Optional; default value.
     # The setup defined in the earlier point. If this setup is None,
     # then the only setup that will be considered is taken from the
     # endpoint being processed. If the endpoint does not define its

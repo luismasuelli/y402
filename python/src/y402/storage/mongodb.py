@@ -70,11 +70,11 @@ class StorageManager(BaseStorageManager):
             pass
 
         collection_.insert_one({
-            "payment_id": payment_id,
+            "payment_id": str(payment_id),
             "payload": payload.model_dump(),
             "matched_requirements": matched_requirements.model_dump(),
             "status": "verified",
-            "webhook_payload": settled_payment,
+            "webhook_payload": settled_payment.model_dump(),
             "webhook_name": webhook_name,
             "created_on": datetime.datetime.now(tz=datetime.UTC)
         })
@@ -92,7 +92,7 @@ class StorageManager(BaseStorageManager):
         """
 
         self._database[collection].update_one(
-            {"payment_id": payment_id},
+            {"payment_id": str(payment_id)},
             {"$set": {
                 "status": "settled",
                 "webhook_payload.transaction_hash": transaction,
@@ -164,12 +164,17 @@ class StorageManager(BaseStorageManager):
                 self._batch_one(collection, webhook_name, worker_id, stamp)
 
         # 3. Return the records.
-        return list(self._database[collection].find({
+        result = []
+        cursor = self._database[collection].find({
             "status": "settled",
             "webhook_name": webhook_name,
             "worker": worker_id,
             "batched_on": {"gt": min_date}
-        }))
+        })
+        for document in cursor:
+            document.pop("_id", None)
+            result.append(SettledPayment(**document))
+        return result
 
     def mark_as_sent(self, collection: str, payment_id: Union[str, uuid4]):
         """

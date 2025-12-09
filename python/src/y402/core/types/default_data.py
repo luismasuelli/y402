@@ -126,5 +126,10 @@ KNOWN_NETWORKS_AND_TOKENS = {
                 "symbol": "$"
             }
         }
+    },
+    # These are local development networks only.
+    "local": {
+        "chain_id": 31337,
+        "tokens": {}
     }
 }

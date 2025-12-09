@@ -1,66 +1,22 @@
-## Foundry
+# Web3-side examples
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+For this example, this is the web3 side: a generic contract serving ERC-3009 purposes as well.
+This project requires [Foundry](https://getfoundry.sh/) to be installed, and it's only purpose
+is to have a dumb token to play with for the purpose of x402 (y402) protocol.
 
-Foundry consists of:
+## Installation
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+This is easy and pretty much standard for a Foundry project:
 
-## Documentation
+1. Have Foundry installed (this example uses: `forge`, `anvil`, `cast`). The default setup (i.e.
+   not needed to use the ZK setup or so).
 
-https://book.getfoundry.sh/
+2. Launch `anvil`: Rather than doing this process directly, we'll use a convenience script
+   coming with the example and leveraging the power of the fake accounts that come with
+   fake money (we'll use 4 different accounts for this purpose):
 
-## Usage
+   ```shell
+   ./anvil-setup.sh
+   ```
 
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+3. Launch the other components of this example (servers, workers, clients).

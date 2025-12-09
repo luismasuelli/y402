@@ -1,11 +1,12 @@
 from typing import List, Union
 from uuid import uuid4
+from pydantic import BaseModel
 from ...core.types.client import PaymentPayload
 from ...core.types.requirements import PaymentRequirements
 from .payment import SettledPayment
 
 
-class StorageManager:
+class StorageManager(BaseModel):
     """
     This class defines a synchronous storage manager for
     the post-verified user payment requests.

@@ -56,8 +56,8 @@ class VerifyResponse(BaseModel):
     """
 
     is_valid: bool = Field(alias="isValid")
-    invalid_reason: Optional[str] = Field(None, alias="invalidReason")
-    payer: Optional[str]
+    invalid_reason: Optional[str] = Field(default=None, alias="invalidReason")
+    payer: Optional[str] = Field(default=None)
 
     model_config = ConfigDict(
         alias_generator=to_camel,
@@ -78,7 +78,7 @@ class SettleResponse(BaseModel):
     """
 
     success: bool
-    error_reason: Optional[str] = None
+    error_reason: Optional[str] = Field(None, alias="errorReason")
     transaction: Optional[str] = None
     network: Optional[str] = None
     payer: Optional[str] = None
@@ -90,7 +90,7 @@ class SettleResponse(BaseModel):
     )
 
 
-FacilitatorHeaders = Dict[Literal['settle', 'verify'], dict | Callable[[], dict], Callable[[], Awaitable[dict]]]
+FacilitatorHeaders = Dict[Literal['settle', 'verify'], dict | Callable[[], dict] | Callable[[], Awaitable[dict]]]
 FacilitatorHeaders.__doc__ = """
 The way the headers are built when performing requests to
 an x402 facilitator. They can be per endpoint and of types:
@@ -101,7 +101,7 @@ an x402 facilitator. They can be per endpoint and of types:
 """
 
 
-class FacilitatorConfig(BaseModel, total=False):
+class FacilitatorConfig(BaseModel):
     """
     Configuration for the X402 facilitator service.
 

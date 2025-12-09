@@ -21,7 +21,7 @@ def _forbid_awaitable(result: Any, method: str) -> Any:
 
 def _send_batch(
     worker_id: str, webhook_name: str, webhook_url: str, api_key: str,
-    manager: StorageManager, collection: str, logger: logging.Logger
+    storage_manager: StorageManager, collection: str, logger: logging.Logger
 ):
     """
     Performs the processing of a single batch being sent. This updates
@@ -33,7 +33,7 @@ def _send_batch(
         webhook_name: The name of the webhook to look records for.
         webhook_url: The URL to send requests to.
         api_key: The api key to use in the X-API-Key header, if any.
-        manager: The associated storage manager.
+        storage_manager: The associated storage manager.
         collection: The collection to use with the manager.
         logger: An optional logger.
     """
@@ -41,7 +41,7 @@ def _send_batch(
     def _send(client: Client, payload: SettledPayment):
         try:
             client.post(url=webhook_url, headers=headers, json=payload.model_dump(mode="json"))
-            _forbid_awaitable(manager.mark_as_sent(collection, element.id_), "mark_as_sent")
+            _forbid_awaitable(storage_manager.mark_as_sent(collection, element.id_), "mark_as_sent")
         except:
             logger.exception(f"An exception occurred when processing payment with id={payload.id_}")
 
@@ -49,7 +49,7 @@ def _send_batch(
     headers = {"X-API-Key": api_key} if api_key else {}
     logger.info("Processing a batch:")
     logger.info("- Retrieving the batch...")
-    batch: List[SettledPayment] = _forbid_awaitable(manager.get_batch(collection, webhook_name, worker_id),
+    batch: List[SettledPayment] = _forbid_awaitable(storage_manager.get_batch(collection, webhook_name, worker_id),
                                                     "get_batch")
     logger.info("- Sending the batch...")
     with Client(timeout=15) as client:
@@ -60,7 +60,7 @@ def _send_batch(
             thread.join()
     logger.info("- Updating the batch...")
     for element in batch:
-        manager.mark_as_sent(collection, element.id_)
+        storage_manager.mark_as_sent(collection, element.id_)
 
 
 def webhook_worker(

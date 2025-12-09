@@ -93,7 +93,7 @@ async def _webhook_worker(
 
 def webhook_worker(
     worker_id: str, webhook_name: str, webhook_url: str, api_key: str,
-    manager: StorageManager, collection: str, logger: logging.Logger = None,
+    storage_manager: StorageManager, collection: str, logger: logging.Logger = None,
     sleep_time: int = 5
 ):
     """
@@ -107,11 +107,11 @@ def webhook_worker(
         webhook_name: The name of the webhook to look records for.
         webhook_url: The URL to send requests to.
         api_key: The api key to use in the X-API-Key header, if any.
-        manager: The associated storage manager.
+        storage_manager: The associated storage manager.
         collection: The collection to use with the manager.
         logger: An optional logger.
         sleep_time: A sleep time between iterations.
     """
 
-    asyncio.run(_webhook_worker(worker_id, webhook_name, webhook_url, api_key, manager, collection,
+    asyncio.run(_webhook_worker(worker_id, webhook_name, webhook_url, api_key, storage_manager, collection,
                                 logger, sleep_time))

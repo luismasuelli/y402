@@ -1,11 +1,8 @@
 from typing import List, Callable, Awaitable
 from flask import Request
 from pydantic import Field
-from ....core.types.endpoint_settings import X402EndpointSettings as BaseX402EndpointSettings
+from ....core.types.endpoint_settings import X402EndpointSettings as BaseX402EndpointSettings, Y402_ENDPOINT_SETTINGS
 from ....core.types.requirements import RequirePaymentDetails
-
-
-Y402_ENDPOINT_SETTINGS = "y402_endpoint_settings"
 
 
 PaymentDetailsListType = List[RequirePaymentDetails] | \

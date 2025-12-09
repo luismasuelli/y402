@@ -6,7 +6,7 @@ from .setup import Y402Setup
 from .storage import StorageManager
 
 
-X402_ENDPOINT_SETTINGS = "x402_endpoint_settings"
+Y402_ENDPOINT_SETTINGS = "y402_endpoint_settings"
 
 
 class X402EndpointSettings(BaseModel):
@@ -79,5 +79,5 @@ class X402EndpointSettings(BaseModel):
     # less than 10 seconds it will become actually 10 seconds).
 
     def __call__(self, endpoint):
-        setattr(endpoint, X402_ENDPOINT_SETTINGS, self)
+        setattr(endpoint, Y402_ENDPOINT_SETTINGS, self)
         return endpoint

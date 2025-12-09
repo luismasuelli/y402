@@ -25,7 +25,7 @@ class FacilitatorClient:
             The dictionary of headers.
         """
 
-        return make_headers(self._config.headers, endpoint)
+        return make_headers(self._config.headers or {}, endpoint)
 
     def _check_verify_status(self, status_code: int, content: bytes, content_type: str):
         """
@@ -93,7 +93,7 @@ class FacilitatorClient:
         """
 
         obj = SettleResponse(**obj)
-        if obj.is_valid:
+        if not obj.success:
             raise SettleFacilitatorFailedError(obj)
         return obj
 

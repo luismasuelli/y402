@@ -1,5 +1,5 @@
 from typing import Optional
-from .endpoint_settings import X402_ENDPOINT_SETTINGS
+from .endpoint_settings import Y402_ENDPOINT_SETTINGS
 from .setup import Y402Setup
 
 
@@ -19,7 +19,7 @@ class FinalEndpointSetupRegistry:
 
     def __getitem__(self, item):
         if item not in self._full_data_by_endpoint:
-            endpoint_settings = getattr(item, X402_ENDPOINT_SETTINGS, None)
+            endpoint_settings = getattr(item, Y402_ENDPOINT_SETTINGS, None)
             endpoint_custom_setup = endpoint_settings and endpoint_settings.custom_setup
             if self._middleware_custom_setup and endpoint_custom_setup:
                 setup = self._middleware_custom_setup | endpoint_custom_setup
