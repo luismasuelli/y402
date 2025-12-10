@@ -51,7 +51,7 @@ class FacilitatorClient:
         """
 
         obj = VerifyResponse(**obj)
-        if obj.is_valid:
+        if not obj.is_valid:
             raise VerifyFacilitatorInvalidError(obj)
         return obj
 
