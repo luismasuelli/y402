@@ -124,15 +124,11 @@ def _validate_common_request(
     if version != X402_VERSION:
         raise ValueError(f"Unsupported x402Version: {version}, expected {X402_VERSION}")
 
-    # Extract & decode paymentHeader
-    payment_header = data.get("paymentHeader")
-    if not isinstance(payment_header, str):
-        raise ValueError("paymentHeader must be a base64-encoded string")
-
-    payment_payload = _decode_payment_header(payment_header)
-
-    # Extract paymentRequirements (this is exactly what your resource server sent in 402 body)
+    # Extract paymentHeader / paymentRequirements (this is exactly what your resource server sent in 402 body)
+    payment_payload = data.get("paymentPayload")
     payment_requirements = data.get("paymentRequirements")
+    if not isinstance(payment_payload, dict):
+        raise ValueError("paymentPayload must be an object")
     if not isinstance(payment_requirements, dict):
         raise ValueError("paymentRequirements must be an object")
 

@@ -121,15 +121,11 @@ def _validate_common_request(data: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict
     if version != X402_VERSION:
         raise ValueError(f"Unsupported x402Version: {version}, expected {X402_VERSION}")
 
-    # Extract & decode paymentHeader
-    payment_header = data.get("paymentHeader")
-    if not isinstance(payment_header, str):
-        raise ValueError("paymentHeader must be a base64-encoded string")
-
-    payment_payload = _decode_payment_header(payment_header)
-
-    # Extract paymentRequirements (this is exactly what your resource server sent in 402 body)
+    # Extract paymentHeader / paymentRequirements (this is exactly what your resource server sent in 402 body)
+    payment_payload = data.get("paymentPayload")
     payment_requirements = data.get("paymentRequirements")
+    if not isinstance(payment_payload, dict):
+        raise ValueError("paymentPayload must be an object")
     if not isinstance(payment_requirements, dict):
         raise ValueError("paymentRequirements must be an object")
 
@@ -312,6 +308,7 @@ def verify() -> Any:
     """
     try:
         data = _parse_json_body()
+        print("Data from /verify:", data, "headers:", request.headers)
     except ValueError as exc:
         return jsonify({"isValid": False, "invalidReason": str(exc)}), 400
 
@@ -353,6 +350,7 @@ def settle() -> Any:
     """
     try:
         data = _parse_json_body()
+        print("Data from /settle:", data, "headers:", request.headers)
     except ValueError as exc:
         # For settle, 4xx is fine because the resource server is the caller.
         return jsonify(
