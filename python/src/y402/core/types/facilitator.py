@@ -37,8 +37,8 @@ class BaseRequest(BaseModel):
 
         return {
             "x402Version": self.x402_version,
-            "paymentPayload": self.model_dump(by_alias=True),
-            "paymentRequirements": self.model_dump(
+            "paymentPayload": self.payment_payload.model_dump(by_alias=True),
+            "paymentRequirements": self.payment_requirements.model_dump(
                 by_alias=True, exclude_none=True
             ),
         }
