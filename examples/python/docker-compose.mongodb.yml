@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: dumb_mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: initial_db
+    ports:
+      - "27517:27017"
+    volumes:
+      - ./mongo_data:/data/db
