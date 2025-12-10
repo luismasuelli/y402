@@ -35,7 +35,7 @@ class FacilitatorClient(BaseFacilitatorClient):
         try:
             async with httpx.AsyncClient(timeout=15) as client:
                 response = await client.post(self._config.url.rstrip("/") + "/verify", headers=headers,
-                                             json=request.model_dump(mode="json"), timeout=timeout)
+                                             json=request.to_json(), timeout=timeout)
                 response.read()
                 self._check_verify_status(response.status_code, response.content, response.headers.get('Content-Type'))
                 return self._parse_verify_obj(response.json())
@@ -62,7 +62,7 @@ class FacilitatorClient(BaseFacilitatorClient):
         try:
             async with httpx.AsyncClient(timeout=15) as client:
                 response = await client.post(self._config.url.rstrip("/") + "/settle", headers=headers,
-                                             json=request.model_dump(mode="json"), timeout=timeout)
+                                             json=request.to_json(), timeout=timeout)
                 response.read()
                 self._check_settle_status(response.status_code, response.content, response.headers.get('Content-Type'))
                 return self._parse_settle_obj(response.json())
