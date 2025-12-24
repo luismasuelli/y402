@@ -10,6 +10,7 @@ httpx==0.28.1
 
 ## These are used to serve the API: fastapi, in this example.
 fastapi==0.121.1
+uvicorn==0.40.0
 
 ## These ones are used for:
 ## - Payment & webhook request storage: pymongo.
