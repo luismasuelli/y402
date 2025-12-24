@@ -38,7 +38,8 @@ async def _send_batch(
 
     async def _send(client: AsyncClient, payload: SettledPayment):
         try:
-            await client.post(url=webhook_url, headers=headers, json=payload.model_dump(mode="json"))
+            response = await client.post(url=webhook_url, headers=headers, json=payload.model_dump(mode="json"))
+            response.raise_for_status()
             await _maybe_await(manager.mark_as_sent(collection, payload.id_))
         except:
             logger.exception(f"An exception occurred when processing payment with id={payload.id_}")
