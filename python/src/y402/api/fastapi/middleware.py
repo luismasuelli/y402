@@ -2,6 +2,7 @@ import base64
 import inspect
 from typing import Callable, Optional, List, Literal
 import logging
+from starlette.routing import Match
 from fastapi import Request, HTTPException
 from pydantic import validate_call
 from .prices import compute_prices
@@ -20,6 +21,24 @@ from ...core.utils.prices import PriceComputingError
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+
+def _fill_path_params(request: Request):
+    """
+    Fills the .path_params attribute inside the request,
+    if it's not already filled.
+    :param request: The request object.
+    """
+
+    if not request.path_params:
+        path_params = {}
+        for route in request.app.routes:
+            if hasattr(route, "matches"):
+                match, child_scope = route.matches(request.scope)
+                if match == Match.FULL:
+                    path_params = child_scope.get("path_params", {})
+                    break
+        request.scope["path_params"] = path_params
 
 
 @validate_call
@@ -118,6 +137,7 @@ def payment_required(
         try:
             merged_setup: Y402Setup = registry[endpoint]
             chain_id_by_name = merged_setup.get_chain_ids_mapping()
+            _fill_path_params(request)
             prices: List[FinalRequiredPaymentDetails] = await compute_prices(
                 request, endpoint_data.payments_details, merged_setup
             )
@@ -222,7 +242,7 @@ def payment_required(
 
         # 11. Actually process the payment.
         try:
-            result = await process_payment(
+            result = process_payment(
                 resource_url, endpoint_data.tags, reference, payment,
                 requirement, merged_setup, facilitator_config,
                 storage_manager, storage_collection, endpoint_data.webhook_name
