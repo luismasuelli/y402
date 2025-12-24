@@ -238,7 +238,7 @@ def _execute_eip3009_transfer(auth: Dict[str, Any], signature: str) -> str:
 
     # Sign & send
     signed = w3.eth.account.sign_transaction(tx, private_key=FACILITATOR_PRIVATE_KEY)
-    tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
+    tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
 
     # For a "dumb" facilitator, just returning the tx hash is fine.
     return tx_hash.hex()
