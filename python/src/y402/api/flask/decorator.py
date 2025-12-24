@@ -274,7 +274,7 @@ def payment_required(
                 response_.headers["X-PAYMENT-RESPONSE"] = base64.b64encode(
                     settle_response.model_dump_json(by_alias=True).encode("utf-8")
                 ).decode("utf-8")
-                return response
+                return response_
             except:
                 return response(500,
                                 "An error occurred, but a payment was already processed. "
