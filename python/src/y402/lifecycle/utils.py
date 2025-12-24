@@ -38,7 +38,7 @@ def create_settled_payment(
     """
 
     return SettledPayment(
-        id_=str(payment_id),
+        id=str(payment_id),
         version=Y402_VERSION,
         identity=PaymentIdentity(
             resource=resource,

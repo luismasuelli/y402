@@ -40,9 +40,9 @@ async def _send_batch(
         try:
             response = await client.post(url=webhook_url, headers=headers, json=payload.model_dump(mode="json"))
             response.raise_for_status()
-            await _maybe_await(manager.mark_as_sent(collection, payload.id_))
+            await _maybe_await(manager.mark_as_sent(collection, payload.id))
         except:
-            logger.exception(f"An exception occurred when processing payment with id={payload.id_}")
+            logger.exception(f"An exception occurred when processing payment with id={payload.id}")
 
     api_key = api_key.strip()
     headers = {"X-API-Key": api_key} if api_key else {}
@@ -54,7 +54,7 @@ async def _send_batch(
         await asyncio.gather(*[_send(client, payload) for payload in batch])
     logger.info("- Updating the batch...")
     for element in batch:
-        manager.mark_as_sent(collection, element.id_)
+        manager.mark_as_sent(collection, element.id)
 
 
 async def _webhook_worker(

@@ -62,7 +62,7 @@ class SettledPayment(BaseModel):
     it when attending the request.
     """
 
-    id_: str = Field(
+    id: str = Field(
         description="The unique ID of the payment"
     )
     version: int = Field(

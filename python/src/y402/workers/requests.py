@@ -42,9 +42,9 @@ def _send_batch(
         try:
             response = session.post(url=webhook_url, headers=headers, json=payload.model_dump(mode="json"), timeout=15)
             response.raise_for_status()
-            _forbid_awaitable(storage_manager.mark_as_sent(collection, payload.id_), "mark_as_sent")
+            _forbid_awaitable(storage_manager.mark_as_sent(collection, payload.id), "mark_as_sent")
         except:
-            logger.exception(f"An exception occurred when processing payment with id={payload.id_}")
+            logger.exception(f"An exception occurred when processing payment with id={payload.id}")
 
     api_key = api_key.strip()
     headers = {"X-API-Key": api_key} if api_key else {}
@@ -61,7 +61,7 @@ def _send_batch(
         thread.join()
     logger.info("- Updating the batch...")
     for element in batch:
-        storage_manager.mark_as_sent(collection, element.id_)
+        storage_manager.mark_as_sent(collection, element.id)
 
 
 def webhook_worker(
