@@ -425,4 +425,64 @@ async def endpoint(...):
 
 ## Usage (endpoint dispatcher)
 
+The endpoint dispatcher is a kind of worker that should run forever. This
+endpoint performs the following cycle:
+
+1. Takes the settled, but not finished, payments _of certain type_.
+   This _type_ will match, actually, the `webhook_name=` argument
+   provided to a `@X402EndpointSettings` decorator in your application.
+2. Reserves them for itself. Reserving it is a complex detail, but it
+   relates to a `worker_id` (an arbitrary string value) given at start
+   (execution of a worker).
+3. Sends them to a specific endpoint, also configured at start. The
+   endpoint is a full URL (http://... or https://...) and, optionally,
+   a proper API key (if given, it will fly into the X-Api-Key header;
+   this is only mandatory if the endpoint requires an X-Api-Key header
+   for authentication).
+
+This, in a loop that runs until stopped.
+
+In order to run a worker, consider the following snippet:
+
+```python
+from y402.storage.mongodb import StorageManager
+
+# Pick only one of:
+from y402.workers.httpx import webhook_worker
+from y402.workers.httpx_sync import webhook_worker
+from y402.workers.requests import webhook_worker
+
+webhook_worker(worker_id="my-awesome-worker",
+               webhook_name="some_webhook_name",
+               webhook_url="http://some-server:8080/some/endpoint",
+               api_key="",  # No API key needed == use empty or omit it.
+               storage_manager=StorageManager("mongodb://...", "some_database"),
+               collection="some_collection",
+               logger=some_logger,  # An optional logging.Logger object.
+               sleep_time=10)  # Sleep time, expressed in seconds.
+```
+
+This, considering some remarks:
+
+1. The `webhook_name` should match a webhook_name used in your application.
+   This means that `some_webhook_name` is the name to use for this example,
+   since it was used in previous `@X402EndpointSettings` decorators. This
+   means that stuff stored by that endpoint (and all the endpoints using
+   the same webhook_name) will be attended.
+2. The webhook URL is arbitrary and related only to this worker, but must
+   be a fully-qualified URL. If that remote endpoint (behind that URL) use
+   the X-Api-Key authentication, specify the key in the `api_key=` argument.
+3. The `storage_manager=` and `collection=` must match, respectively, the
+   `storage_manager=` used at middleware / decorator level and the given
+   collection name at `storage_collection=` in the `@X402EndpointSettings`
+   decorator definition. Given these settings, only the endpoints with the
+   same `webhook_name` and same storage settings will find their payments
+   being handled by this worker.
+4. The `worker_id` is arbitrary, useful if several workers attend the same
+   `webhook_name`.
+5. `logger=` is optional (anyway, a default logger is used), and `sleep_time`
+   is `5` (seconds) by default if not specified.
+
+With this, the worker will run and process all the logs in those settings.
+
 ### Understanding endpoints
