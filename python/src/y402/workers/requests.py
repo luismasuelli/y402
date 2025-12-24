@@ -65,7 +65,7 @@ def _send_batch(
 
 def webhook_worker(
     worker_id: str, webhook_name: str, webhook_url: str, api_key: str,
-    manager: StorageManager, collection: str, logger: logging.Logger = None,
+    storage_manager: StorageManager, collection: str, logger: logging.Logger = None,
     sleep_time: int = 5
 ):
     """
@@ -79,7 +79,7 @@ def webhook_worker(
         webhook_name: The name of the webhook to look records for.
         webhook_url: The URL to send requests to.
         api_key: The api key to use in the X-API-Key header, if any.
-        manager: The associated storage manager.
+        storage_manager: The associated storage manager.
         collection: The collection to use with the manager.
         logger: An optional logger.
         sleep_time: A sleep time between iterations.
@@ -90,7 +90,7 @@ def webhook_worker(
     logger.info(f"Starting webhook worker loop.\n- webhook_name={webhook_name}\n- worker_id={worker_id}")
     try:
         while True:
-            _send_batch(worker_id, webhook_name, webhook_url, api_key, manager, collection, logger)
+            _send_batch(worker_id, webhook_name, webhook_url, api_key, storage_manager, collection, logger)
             time.sleep(sleep_time)
     except KeyboardInterrupt:
         logger.info(f"Worker loop cancelled by the user")
