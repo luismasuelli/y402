@@ -49,7 +49,7 @@ async def _send_batch(
     logger.info("- Retrieving the batch...")
     batch: List[SettledPayment] = await _maybe_await(manager.get_batch(collection, webhook_name, worker_id))
     logger.info("- Sending the batch...")
-    with AsyncClient(timeout=15) as client:
+    async with AsyncClient(timeout=15) as client:
         await asyncio.gather(*[_send(client, payload) for payload in batch])
     logger.info("- Updating the batch...")
     for element in batch:
