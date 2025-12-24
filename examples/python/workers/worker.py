@@ -1,4 +1,8 @@
 import os
+import logging
+
+
+logging.basicConfig()
 
 
 MONGODB_URL = "mongodb://root:example@localhost:27517/mydb?authSource=admin"
