@@ -19,6 +19,7 @@ class StorageManager(BaseStorageManager):
     """
 
     def __init__(self, url: str, database: str, batch_expiration: int = _BE, batch_size: int = _BS):
+        super().__init__()
         url = url.strip()
         database = database.strip()
         if not url or not database:
@@ -26,6 +27,7 @@ class StorageManager(BaseStorageManager):
                              "MongoDB-based StorageManager")
         self._client = MongoClient(url)
         self._database = self._client[database]
+        print(f">>>>>>>> Database is: {database}")
         self._batch_expiration = max(_BE, batch_expiration) if isinstance(batch_expiration, int) else _BE
         self._batch_expiration_delta = datetime.timedelta(seconds=self._batch_expiration)
         self._batch_size = max(_BS, batch_size) if isinstance(batch_size, int) else _BS
@@ -61,10 +63,19 @@ class StorageManager(BaseStorageManager):
         """
 
         collection_: Collection = self._database[collection]
+        print(f">>>>>>>> Collection is: {collection}")
 
         try:
             collection_.create_index({"payment_id": HASHED}, unique=True)
+        except:
+            pass
+
+        try:
             collection_.create_index({"webhook_name": HASHED})
+        except:
+            pass
+
+        try:
             collection_.create_index({"status": HASHED})
         except:
             pass
@@ -120,6 +131,7 @@ class StorageManager(BaseStorageManager):
         """
 
         min_date = stamp - self._batch_expiration_delta
+        # TODO there's an error here, somehow.
         result = self._database[collection].find_one_and_update({
             "status": "settled",
             "webhook_name": webhook_name,
@@ -153,15 +165,16 @@ class StorageManager(BaseStorageManager):
         min_date = stamp - self._batch_expiration_delta
 
         # 2. Batch remaining items.
-        count = self._database[collection].count_documents({
+        already_batched_count = self._database[collection].count_documents({
             "status": "settled",
             "webhook_name": webhook_name,
             "worker": worker_id,
             "batched_on": {"gt": min_date}
         })
-        if batch_size < count:
-            for _ in range(count - batch_size):
-                self._batch_one(collection, webhook_name, worker_id, stamp)
+        if already_batched_count < batch_size:
+            for _ in range(batch_size - already_batched_count):
+                if not self._batch_one(collection, webhook_name, worker_id, stamp):
+                    break
 
         # 3. Return the records.
         result = []
