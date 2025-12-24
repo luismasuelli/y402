@@ -49,4 +49,7 @@ if __name__ == "__main__":
         result = asyncio.run(result)
     print("POST result:")
     print(">>> Headers:", result.headers)
-    print(">>> JSON:", result.json())
+    try:
+        print(">>> JSON:", result.json())
+    except:
+        print(">>> Content:", result.content)
