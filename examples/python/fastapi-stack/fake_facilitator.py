@@ -210,8 +210,8 @@ def _execute_eip3009_transfer(auth: Dict[str, Any], signature: str) -> str:
     nonce_tx = w3.eth.get_transaction_count(FACILITATOR_ACCOUNT.address)
 
     print(f"""
-    Try this command: cast send {TOKEN_CONTRACT} "transferWithAuthorization(address,address,uint256,uint256,uint256,bytes32,uint8,bytes32,bytes32)" {from_addr} {to_addr} {value} {valid_after} {valid_before} {nonce} {v} {r} {s} --rpc-url '{RPC_URL}' --private-key {FACILITATOR_PRIVATE_KEY}
-    """)
+    Try this command: cast send {TOKEN_CONTRACT.address} "transferWithAuthorization(address,address,uint256,uint256,uint256,bytes32,uint8,bytes32,bytes32)" {from_addr} {to_addr} {value} {valid_after} {valid_before} {nonce} {v} {r} {s} --rpc-url '{RPC_URL}' --private-key {FACILITATOR_PRIVATE_KEY}
+    """.strip())
 
     tx = TOKEN_CONTRACT.functions.transferWithAuthorization(
         from_addr,

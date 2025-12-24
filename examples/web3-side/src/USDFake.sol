@@ -121,13 +121,13 @@ contract USDFake is ERC20, EIP712 {
         emit AuthorizationCanceled(authorizer, nonce);
     }
 
-    function _recoverAuthorizationSigner(bytes32 structHash, bytes memory signature)
+    function _recoverAuthorizationSigner(bytes32 structHash, uint8 v, bytes32 r, bytes32 s)
     internal
     view
     returns (address)
     {
         bytes32 digest = _hashTypedDataV4(structHash);
-        return ECDSA.recover(digest, signature);
+        return ECDSA.recover(digest, abi.encodePacked(r, s, v));
     }
 
     // --- ERC-3009 core functions -----------------------------------------------
@@ -139,7 +139,9 @@ contract USDFake is ERC20, EIP712 {
     /// @param validAfter  Time after which this is valid (unix timestamp)
     /// @param validBefore Time before which this is valid (unix timestamp)
     /// @param nonce       Unique 32-byte nonce
-    /// @param signature   ECDSA signature over EIP-712 typed data
+    /// @param v           v field of ECDSA signature over EIP-712 typed data
+    /// @param r           r field of ECDSA signature over EIP-712 typed data
+    /// @param s           s field of ECDSA signature over EIP-712 typed data
     function transferWithAuthorization(
         address from,
         address to,
@@ -147,7 +149,9 @@ contract USDFake is ERC20, EIP712 {
         uint256 validAfter,
         uint256 validBefore,
         bytes32 nonce,
-        bytes calldata signature
+        uint8 v,
+        bytes32 r,
+        bytes32 s
     ) external onlyValidTimeframe(validAfter, validBefore) {
         bytes32 structHash = keccak256(
             abi.encode(
@@ -161,7 +165,7 @@ contract USDFake is ERC20, EIP712 {
             )
         );
 
-        address signer = _recoverAuthorizationSigner(structHash, signature);
+        address signer = _recoverAuthorizationSigner(structHash, v, r, s);
         require(signer == from, "USDF: invalid signature");
 
         _useAuthorization(from, nonce);
@@ -177,7 +181,9 @@ contract USDFake is ERC20, EIP712 {
         uint256 validAfter,
         uint256 validBefore,
         bytes32 nonce,
-        bytes calldata signature
+        uint8 v,
+        bytes32 r,
+        bytes32 s
     ) external onlyValidTimeframe(validAfter, validBefore) {
         require(msg.sender == to, "USDF: caller must be payee");
 
@@ -193,7 +199,7 @@ contract USDFake is ERC20, EIP712 {
             )
         );
 
-        address signer = _recoverAuthorizationSigner(structHash, signature);
+        address signer = _recoverAuthorizationSigner(structHash, v, r, s);
         require(signer == from, "USDF: invalid signature");
 
         _useAuthorization(from, nonce);
