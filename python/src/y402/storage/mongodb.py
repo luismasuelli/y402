@@ -27,7 +27,6 @@ class StorageManager(BaseStorageManager):
                              "MongoDB-based StorageManager")
         self._client = MongoClient(url)
         self._database = self._client[database]
-        print(f">>>>>>>> Database is: {database}")
         self._batch_expiration = max(_BE, batch_expiration) if isinstance(batch_expiration, int) else _BE
         self._batch_expiration_delta = datetime.timedelta(seconds=self._batch_expiration)
         self._batch_size = max(_BS, batch_size) if isinstance(batch_size, int) else _BS
@@ -63,7 +62,6 @@ class StorageManager(BaseStorageManager):
         """
 
         collection_: Collection = self._database[collection]
-        print(f">>>>>>>> Collection is: {collection}")
 
         try:
             collection_.create_index({"payment_id": HASHED}, unique=True)
@@ -131,13 +129,12 @@ class StorageManager(BaseStorageManager):
         """
 
         min_date = stamp - self._batch_expiration_delta
-        # TODO there's an error here, somehow.
         result = self._database[collection].find_one_and_update({
             "status": "settled",
             "webhook_name": webhook_name,
             "$or": [
                 {"batched_on": {"$exists": False}},
-                {"batched_on": {"lte": min_date}},
+                {"batched_on": {"$lte": min_date}},
                 {"worker": {"$exists": False}},
                 {"worker": {"$in": ["", None]}},
             ]
@@ -169,7 +166,7 @@ class StorageManager(BaseStorageManager):
             "status": "settled",
             "webhook_name": webhook_name,
             "worker": worker_id,
-            "batched_on": {"gt": min_date}
+            "batched_on": {"$gt": min_date}
         })
         if already_batched_count < batch_size:
             for _ in range(batch_size - already_batched_count):
@@ -182,11 +179,11 @@ class StorageManager(BaseStorageManager):
             "status": "settled",
             "webhook_name": webhook_name,
             "worker": worker_id,
-            "batched_on": {"gt": min_date}
+            "batched_on": {"$gt": min_date}
         })
         for document in cursor:
             document.pop("_id", None)
-            result.append(SettledPayment(**document))
+            result.append(SettledPayment(**document["webhook_payload"]))
         return result
 
     def mark_as_sent(self, collection: str, payment_id: Union[str, uuid4]):
@@ -201,4 +198,4 @@ class StorageManager(BaseStorageManager):
         self._database[collection].update_one({
             "status": "settled",
             "payment_id": str(payment_id)
-        }, {"status": "finished"})
+        }, {"$set": {"status": "finished"}})
