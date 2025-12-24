@@ -486,3 +486,80 @@ This, considering some remarks:
 With this, the worker will run and process all the logs in those settings.
 
 ### Understanding endpoints
+
+There are two endpoint types that matter here:
+
+1. Endpoints intended to receive payments (with the `@X402EndpointSettings`
+   decorator).
+2. Endpoints intended to receive confirmations of payments.
+
+The first endpoints are configured as described earlier (they must be POST
+endpoints, always).
+
+> This repository has some examples in the examples/python/fastapi-stack
+  and examples/python/flask-stack on how to configure them.
+
+The second (type of) endpoints are arbitrary endpoints in arbitrary HTTP
+servers. They're, still, POST endpoints.
+
+The important parts are:
+
+1. These endpoints are developed by the user, entirely, in the HTTP stack
+   they prefer (even if it's not Python).
+2. These endpoints, when attending the request, should not fail or veto
+   anything here. Failure to return 200 will involve the endpoint to be
+   retried later, instead of marking the payment as finished.
+3. These endpoints will receive a body like this (this is an example):
+
+```
+{
+    // The uuid of the payment.
+    'id': 'dce92a17-63c5-468e-8d5b-d5fd08b79d63',
+    
+    // The version of the protocol.
+    'version': 1,
+
+    // The identity / taxonomy of the involved resource.
+    // This might be a unique resource or a not unique one.
+    'identity': {
+        // The original x402 payment endpoint that attended the request.
+        'resource': 'http://localhost:9873/api/purchase/bronze',
+        
+        // The configured tags.
+        'tags': ['dynamic', 'anonymous'],
+        
+        // Optionally, the reference of the payment, it that concept is used.
+        'reference': ''
+    },
+    'details': {
+        // The address doing the payment.
+        'payer': '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
+
+        // The chain into which the address is doing the payment.
+        'chain_id': '31337',
+        
+        // The address of the involved token.
+        'token': '0x5fbdb2315678afecb367f032d93f642f64180aa3',
+        
+        // The amount of the token (expressed as a raw integer value).
+        // This value must be taken into account with respect to the
+        // decimals (ERC-20's decimals()) of the token.
+        'value': '1000000',
+        
+        // The code the token is registered with.
+        'code': 'usdf',
+        
+        // The display name / EIP-712 name of the token.
+        'name': 'USD Fake',
+        
+        // The label corresponding to the actual price being paid.
+        'price_label': '$1'
+    },
+    
+    // The date when this payment was settled.
+    'settled_on': '2025-12-24T21:31:54.200000',
+    
+    // The hash of the transaction when that occurred.
+    'transaction_hash': '9105e97f55cd6712a87233c98c274fd6e873c825a9e1463fd03bb164fea48768'
+}
+```
