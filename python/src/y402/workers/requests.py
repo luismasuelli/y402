@@ -41,7 +41,7 @@ def _send_batch(
     def _send(session: Session, payload: SettledPayment):
         try:
             session.post(url=webhook_url, headers=headers, json=payload.model_dump(mode="json"), timeout=15)
-            _forbid_awaitable(storage_manager.mark_as_sent(collection, element.id_), "mark_as_sent")
+            _forbid_awaitable(storage_manager.mark_as_sent(collection, payload.id_), "mark_as_sent")
         except:
             logger.exception(f"An exception occurred when processing payment with id={payload.id_}")
 
