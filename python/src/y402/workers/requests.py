@@ -51,9 +51,8 @@ def _send_batch(
     logger.info("- Retrieving the batch...")
     batch: List[SettledPayment] = _forbid_awaitable(storage_manager.get_batch(collection, webhook_name, worker_id),
                                                     "get_batch")
-    logger.info("- Sending the batch...")
+    logger.info(f"- Sending the batch ({len(batch)} elements)...")
     session = Session()
-
     threads = [threading.Thread(target=lambda: _send(session, payload)) for payload in batch]
     for thread in threads:
         thread.start()
