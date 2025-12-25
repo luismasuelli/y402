@@ -41,6 +41,7 @@ class PaymentDetails(BaseModel):
                                    "ERC-3009 or be somehow supported by this payment system")
     value: str = Field(description="The decimal representation of the token amount. It will be expressed in "
                                    "the minimal token units according to the decimals supported by the token")
+    pay_to_address: str = Field(description="The address that received the payment")
 
     # Representational fields.
     code: str = Field(description="The codename of the token (e.g. usdt, usdc, eurc, eurt)")

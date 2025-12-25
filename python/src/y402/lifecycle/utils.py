@@ -10,8 +10,8 @@ def create_settled_payment(
     payment_id: uuid4,
     # The identity of the payment.
     resource: str, tags: List[str], reference: str,
-    # The payer, chain id and token / value.
-    payer: str, chain_id: int, token: str, value: str,
+    # The payer, chain id, token / value, and target address.
+    payer: str, chain_id: int, token: str, value: str, pay_to_address: str,
     # The descriptive data.
     code: str, name: str, price_label: str
     # The transaction hash for the settlement.
@@ -29,6 +29,7 @@ def create_settled_payment(
         chain_id: The chain id.
         token: The token contract's address.
         value: The value.
+        pay_to_address: The address that received the payment.
         code: The codename of the token (optional, or "" - typically provided).
         name: The name of the token (optional, or "" - typically provided).
         price_label: The price label of this payment.
@@ -50,6 +51,7 @@ def create_settled_payment(
             chain_id=str(chain_id),
             token=token,
             value=value,
+            pay_to_address=pay_to_address,
             code=code,
             name=name,
             price_label=price_label,

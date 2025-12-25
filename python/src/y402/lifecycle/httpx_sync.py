@@ -62,7 +62,7 @@ def process_payment(
     payment_id = uuid4()
     settled_payment = create_settled_payment(
         payment_id, resource, tags, reference,
-        payer, chain_id, token, value,
+        payer, chain_id, token, value, payment.payload.authorization.to,
         code, name, price_label
     )
 
