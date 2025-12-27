@@ -1,6 +1,6 @@
 # y402
 
-A JavaScript implementation of the X402 (with extension features called Y402). A description of y402 is given in the
+A TypeScript implementation of the X402 (with extension features called Y402). A description of y402 is given in the
 main README.md file in the repository.
 
 ## Install
