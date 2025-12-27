@@ -1,0 +1,12 @@
+{
+  "name": "ts",
+  "version": "1.0.0",
+  "description": "An implementation of x402 protocol, with some particular enhancements.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
