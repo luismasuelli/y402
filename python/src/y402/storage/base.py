@@ -6,8 +6,7 @@ from ..types.payment import SettledPayment
 
 class StorageManager(BaseModel):
     """
-    This class defines a synchronous storage manager for
-    the post-verified user payment requests.
+    This class defines a storage manager for the (post-verified) user payment requests.
     """
 
     def allocate(self, collection: str, payment_id: uuid4,
@@ -27,8 +26,6 @@ class StorageManager(BaseModel):
         The storage manager is totally free to choose other fields for the data
         (e.g. some sort of tagging) system.
 
-        This allocation is synchronous.
-
         Args:
             collection: The collection to store the payment into.
             payment_id: The id of the payment (generated on the fly).
@@ -44,11 +41,11 @@ class StorageManager(BaseModel):
 
     def abort(self, collection: str, payment_id: uuid4):
         """
-        Aborts a payment id, removing its record.
+        Aborts a payment id, marking its record.
 
         Args:
             collection: The collection to remove the payment from.
-            payment_id: The id of the payment to remove.
+            payment_id: The id of the payment to mark.
         """
 
         raise NotImplementedError
@@ -56,8 +53,6 @@ class StorageManager(BaseModel):
     def settle(self, collection: str, payment_id: uuid4, transaction: str):
         """
         Confirms a given payment id, meaning that the /settle endpoint worked.
-
-        This update is synchronous.
 
         Args:
             collection: The collection to settle the payment into.
