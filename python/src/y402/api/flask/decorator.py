@@ -1,5 +1,6 @@
 import base64
 import functools
+import traceback
 from typing import Optional, List, Literal
 import logging
 from flask import request, g, make_response
@@ -21,6 +22,32 @@ from ...core.utils.prices import PriceComputingError
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+
+def _endpoint_invoker(endpoint, reference, custom_paywall_html_, paywall_config_,
+                      chain_id_by_name, args, kwargs):
+    def f(payment_id):
+        # 1. As state, keep: The payment_id, the send payment error (if any),
+        #    and the reference (it might be blank).
+        g.x402 = {
+            "payment_id": payment_id,
+            "reference": reference
+        }
+
+        # 2. Call and wrap the underlying endpoint, which should have a very small logic.
+        try:
+            response_ = make_response(endpoint(*args, **kwargs))
+        except Exception:
+            logger.exception(traceback.format_exc())
+            response_ = response(
+                500,
+                "An error occurred, but a payment was already processed. Contact support "
+                "to claim your product or service by the internal payment "
+                f"id: {payment_id}", custom_paywall_html_, paywall_config_, [], chain_id_by_name
+            )
+
+        return response_, 200 <= response_.status_code < 400
+    return f
 
 
 @validate_call
@@ -246,12 +273,16 @@ def payment_required(
 
             # 11. Actually process the payment.
             try:
-                payment_id, settle_response = process_payment(
-                    resource_url, endpoint_data.tags, reference, payment,
+                invoke_endpoint = _endpoint_invoker(
+                    endpoint, reference, custom_paywall_html_, paywall_config_,
+                    chain_id_by_name, args, kwargs
+                )
+                payment_id, settle_response, response_ = process_payment(
+                    resource_url, endpoint_data.tags, reference, invoke_endpoint, payment,
                     requirement, merged_setup, facilitator_config,
                     storage_manager, storage_collection, endpoint_data.webhook_name
                 )
-                if not settle_response.success:
+                if settle_response and not settle_response.success:
                     return x402_response("Settle failed: " + (settle_response.error_reason or "Unknown error"),
                                          custom_paywall_html_, paywall_config_, payment_requirements,
                                          chain_id_by_name)
@@ -261,26 +292,12 @@ def payment_required(
                 return x402_response("The payment was invalid or it was an error processing it",
                                      custom_paywall_html_, paywall_config_, payment_requirements, chain_id_by_name)
 
-            # 12. As state, keep: The payment_id, the send payment error (if any),
-            #     and the reference (it might be blank).
-            g.x402 = {
-                "payment_id": payment_id,
-                "reference": reference
-            }
-
-            # 13. Call and wrap the underlying endpoint, which should have a very small logic.
-            try:
-                response_ = make_response(endpoint(*args, **kwargs))
+            # 12. Finally, return the internal response.
+            if 200 <= response_.status_code < 400:
                 response_.headers["X-PAYMENT-RESPONSE"] = base64.b64encode(
                     settle_response.model_dump_json(by_alias=True).encode("utf-8")
                 ).decode("utf-8")
-                return response_
-            except:
-                return response(500,
-                                "An error occurred, but a payment was already processed. "
-                                "Contact support to claim your product or service by the internal payment "
-                                f"id: {payment_id}", custom_paywall_html_, paywall_config_, [],
-                                chain_id_by_name)
+            return response_
 
         return new_endpoint
 

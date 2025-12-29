@@ -1,6 +1,6 @@
 import inspect
 import uuid
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Callable, Awaitable
 from uuid import uuid4
 from ..core.types.client import PaymentPayload
 from ..core.types.facilitator import VerifyRequest, X402_VERSION, FacilitatorConfig, SettleRequest, SettleResponse
@@ -19,7 +19,7 @@ async def _maybe_await(result: Any) -> Any:
 
 async def process_payment(
     # The identity of the payment.
-    resource: str, tags: List[str], reference: str,
+    resource: str, tags: List[str], reference: str, endpoint: Callable[[uuid4], tuple | Awaitable[tuple]],
     # User payment selection.
     payment: PaymentPayload, matched_requirements: PaymentRequirements,
     # External components.
@@ -30,7 +30,7 @@ async def process_payment(
     webhook_name: str,
     # Tunings.
     request_timeout: int = 15
-) -> Tuple[uuid.UUID, SettleResponse]:
+) -> Tuple[uuid.UUID, SettleResponse, Any]:
     """
     Processes a given payment.
 
@@ -38,6 +38,7 @@ async def process_payment(
         resource: The (PUBLIC) resource URL.
         tags: The tags that apply.
         reference: The reference that applies.
+        endpoint: The (wrapped) endpoint to invoke.
         payment: The user-submitted payment.
         matched_requirements: The matched requirements.
         setup: An existing Y402 setup.
@@ -49,6 +50,8 @@ async def process_payment(
 
     Returns:
         The processed UUID for this payment. Also, the settle response, if any.
+        Finally, the underlying response from the endpoint. If the response is
+        not a [200..399] response, settle response will be null.
     """
 
     # 1. Prepare all the data for a settled payment. Do this in advance
@@ -85,22 +88,29 @@ async def process_payment(
     await _maybe_await(storage_manager.allocate(storage_collection, payment_id, payment, matched_requirements,
                                                 settled_payment, webhook_name))
 
-    # 5. Settle the payment. By this point, the payment is consumed
-    #    and the corresponding record is marked as such.
-    response = await facilitator_client.settle(SettleRequest(
-        x402Version=X402_VERSION,
-        paymentPayload=payment,
-        paymentRequirements=matched_requirements,
-        timeout=request_timeout
-    ))
+    # 5. Execute the underlying endpoint.
+    response, success = _maybe_await(endpoint(payment_id))
 
-    # 6. Here, the response was successful in terms of HTTP (200)
-    #    and the settling was successful as well.
-    #
-    #    If the setting were not to be successful, then it would
-    #    not execute this point (committing the settlement).
-    if response.success:
-        await _maybe_await(storage_manager.settle(
-            storage_collection, payment_id, response.transaction
+    if success:
+        # 6. Settle the payment. By this point, the payment is consumed
+        #    and the corresponding record is marked as such.
+        settle_response = await facilitator_client.settle(SettleRequest(
+            x402Version=X402_VERSION,
+            paymentPayload=payment,
+            paymentRequirements=matched_requirements,
+            timeout=request_timeout
         ))
-    return payment_id, response
+
+        # 7. Here, the response was successful in terms of HTTP (200)
+        #    and the settling was successful as well.
+        #
+        #    If the setting were not to be successful, then it would
+        #    not execute this point (committing the settlement).
+        if settle_response.success:
+            await _maybe_await(storage_manager.settle(
+                storage_collection, payment_id, settle_response.transaction
+            ))
+    else:
+        settle_response = None
+        await _maybe_await(storage_manager.abort(storage_collection, payment_id))
+    return payment_id, settle_response, response

@@ -1,5 +1,6 @@
 import base64
 import inspect
+import traceback
 from typing import Callable, Optional, List, Literal
 import logging
 from starlette.routing import Match
@@ -21,6 +22,30 @@ from ...core.utils.prices import PriceComputingError
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+
+def _endpoint_invoker(request, call_next, reference, custom_paywall_html_, paywall_config_,
+                      chain_id_by_name):
+    async def f(payment_id):
+        # 1. As state, keep: The payment_id, the send payment error (if any),
+        #    and the reference (it might be blank).
+        request.state.x402 = {
+            "payment_id": payment_id,
+            "reference": reference
+        }
+
+        # 2. Call and wrap the underlying endpoint, which should have a very small logic.
+        try:
+            response_ = await call_next(request)
+        except Exception:
+            logger.exception(traceback.format_exc())
+            response_ = response(request, 500,
+                                 "An error occurred, but a payment was already processed. Contact support "
+                                 f"to claim your product or service by the internal payment id: {payment_id}",
+                                 custom_paywall_html_, paywall_config_, [], chain_id_by_name)
+
+        return response_, 200 <= response_.status_code < 400
+    return f
 
 
 def _fill_path_params(request: Request):
@@ -242,15 +267,17 @@ def payment_required(
 
         # 11. Actually process the payment.
         try:
-            result = process_payment(
-                resource_url, endpoint_data.tags, reference, payment,
+            invoke_endpoint = _endpoint_invoker(request, call_next, reference, custom_paywall_html_,
+                                                paywall_config_, chain_id_by_name)
+            result = await process_payment(
+                resource_url, endpoint_data.tags, reference, invoke_endpoint, payment,
                 requirement, merged_setup, facilitator_config,
                 storage_manager, storage_collection, endpoint_data.webhook_name
             )
             if inspect.isawaitable(result):
                 result = await result
-            payment_id, settle_response = result
-            if not settle_response.success:
+            payment_id, settle_response, response_ = result
+            if settle_response and not settle_response.success:
                 return x402_response(request, "Settle failed: " + (settle_response.error_reason or "Unknown error"),
                                      custom_paywall_html_, paywall_config_, payment_requirements,
                                      chain_id_by_name)
@@ -260,24 +287,11 @@ def payment_required(
             return x402_response(request, "The payment was invalid or it was an error processing it",
                                  custom_paywall_html_, paywall_config_, payment_requirements, chain_id_by_name)
 
-        # 12. As state, keep: The payment_id, the send payment error (if any),
-        #     and the reference (it might be blank).
-        request.state.x402 = {
-            "payment_id": payment_id,
-            "reference": reference
-        }
+        # 12. Finally, return the internal response.
+        response_.headers["X-PAYMENT-RESPONSE"] = base64.b64encode(
+            settle_response.model_dump_json(by_alias=True).encode("utf-8")
+        ).decode("utf-8")
 
-        # 13. Call and wrap the underlying endpoint, which should have a very small logic.
-        try:
-            response_ = await call_next(request)
-            response_.headers["X-PAYMENT-RESPONSE"] = base64.b64encode(
-                settle_response.model_dump_json(by_alias=True).encode("utf-8")
-            ).decode("utf-8")
-            return response_
-        except:
-            return response(request, 500,
-                            "An error occurred, but a payment was already processed. Contact support "
-                            f"to claim your product or service by the internal payment id: {payment_id}",
-                            custom_paywall_html_, paywall_config_, [], chain_id_by_name)
+        return response_
 
     return middleware
