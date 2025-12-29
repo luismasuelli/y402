@@ -15,7 +15,7 @@ from ...core.types.paywall import PaywallConfig
 from ...core.types.registry import FinalEndpointSetupRegistry
 from ...core.types.requirements import FinalRequiredPaymentDetails, PaymentRequirements
 from ...core.types.setup import Y402Setup
-from ...core.types.storage import StorageManager
+from ...storage.base import StorageManager
 from ...core.utils.headers import decode_payment_header, validate_payment_asset
 from ...core.utils.prices import PriceComputingError
 

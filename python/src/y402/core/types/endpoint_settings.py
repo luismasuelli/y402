@@ -3,7 +3,6 @@ from pydantic import BaseModel, Field
 from .paywall import PaywallConfig
 from .schema import HTTPInputSchema
 from .setup import Y402Setup
-from .storage import StorageManager
 
 
 Y402_ENDPOINT_SETTINGS = "y402_endpoint_settings"

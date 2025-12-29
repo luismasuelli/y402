@@ -2,11 +2,11 @@ import inspect
 import uuid
 from typing import List, Tuple, Any, Callable, Awaitable
 from uuid import uuid4
+from ..storage.base import StorageManager
 from ..core.types.client import PaymentPayload
 from ..core.types.facilitator import VerifyRequest, X402_VERSION, FacilitatorConfig, SettleRequest, SettleResponse
 from ..core.types.requirements import PaymentRequirements
 from ..core.types.setup import Y402Setup
-from ..core.types.storage import StorageManager
 from ..facilitator_client.httpx import FacilitatorClient
 from ..lifecycle.utils import create_settled_payment
 

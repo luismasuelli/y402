@@ -1,9 +1,7 @@
 from typing import List, Union
 from uuid import uuid4
 from pydantic import BaseModel
-from ...core.types.client import PaymentPayload
-from ...core.types.requirements import PaymentRequirements
-from .payment import SettledPayment
+from ..types.payment import SettledPayment
 
 
 class StorageManager(BaseModel):
@@ -13,7 +11,7 @@ class StorageManager(BaseModel):
     """
 
     def allocate(self, collection: str, payment_id: uuid4,
-                 payload: PaymentPayload, matched_requirements: PaymentRequirements,
+                 payload: BaseModel, matched_requirements: BaseModel,
                  settled_payment: SettledPayment, webhook_name: str):
         """
         Stores an authorization in 'verified' state. It tells the authorization

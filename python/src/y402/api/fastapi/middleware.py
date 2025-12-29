@@ -10,12 +10,12 @@ from .prices import compute_prices
 from .request_data import resolve_endpoint, get_root_url
 from .response_presets import x402_response, response
 from .types.endpoint_settings import X402EndpointSettings, Y402_ENDPOINT_SETTINGS
+from ...storage.base import StorageManager
 from ...core.types.facilitator import FacilitatorConfig
 from ...core.types.paywall import PaywallConfig
 from ...core.types.registry import FinalEndpointSetupRegistry
 from ...core.types.requirements import FinalRequiredPaymentDetails, PaymentRequirements
 from ...core.types.setup import Y402Setup
-from ...core.types.storage import StorageManager
 from ...core.utils.headers import decode_payment_header, validate_payment_asset
 from ...core.utils.prices import PriceComputingError
 

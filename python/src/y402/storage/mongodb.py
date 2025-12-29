@@ -1,12 +1,11 @@
 import datetime
 from typing import List, Union
 from uuid import uuid4
+from pydantic import BaseModel
 from pymongo import MongoClient, HASHED
 from pymongo.collection import Collection
-from ..core.types.client import PaymentPayload
-from ..core.types.payment import SettledPayment
-from ..core.types.requirements import PaymentRequirements
-from ..core.types.storage import StorageManager as BaseStorageManager
+from ..types.payment import SettledPayment
+from .base import StorageManager as BaseStorageManager
 
 
 _BS = 50
@@ -32,7 +31,7 @@ class StorageManager(BaseStorageManager):
         self._batch_size = max(_BS, batch_size) if isinstance(batch_size, int) else _BS
 
     def allocate(self, collection: str, payment_id: uuid4,
-                 payload: PaymentPayload, matched_requirements: PaymentRequirements,
+                 payload: BaseModel, matched_requirements: BaseModel,
                  settled_payment: SettledPayment, webhook_name: str):
         """
         Stores an authorization in 'verified' state. It tells the authorization

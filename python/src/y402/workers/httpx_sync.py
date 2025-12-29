@@ -4,8 +4,8 @@ import threading
 import time
 from typing import Any, List
 from httpx import Client
-from ..core.types.payment import SettledPayment
-from ..core.types.storage import StorageManager
+from ..storage.base import StorageManager
+from ..types.payment import SettledPayment
 
 
 LOGGER = logging.getLogger(__name__)
