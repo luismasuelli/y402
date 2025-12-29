@@ -47,8 +47,6 @@ class StorageManager(BaseStorageManager):
         The storage manager is totally free to choose other fields for the data
         (e.g. some sort of tagging) system.
 
-        This allocation is synchronous.
-
         Args:
             collection: The collection to store the payment into.
             payment_id: The id of the payment (generated on the fly).
@@ -103,8 +101,6 @@ class StorageManager(BaseStorageManager):
     def settle(self, collection: str, payment_id: uuid4, transaction: str):
         """
         Confirms a given payment id, meaning that the /settle endpoint worked.
-
-        This update is synchronous.
 
         Args:
             collection: The collection to commit / confirm the payment into.
