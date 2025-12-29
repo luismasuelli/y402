@@ -88,6 +88,19 @@ class StorageManager(BaseStorageManager):
             "created_on": datetime.datetime.now(tz=datetime.UTC)
         })
 
+    def abort(self, collection: str, payment_id: uuid4):
+        """
+        Aborts a payment id, removing its record.
+
+        Args:
+            collection: The collection to remove the payment from.
+            payment_id: The id of the payment to remove.
+        """
+
+        collection_: Collection = self._database[collection]
+
+        collection_.delete_one({"payment_id": str(payment_id), "status": "verified"})
+
     def settle(self, collection: str, payment_id: uuid4, transaction: str):
         """
         Confirms a given payment id, meaning that the /settle endpoint worked.

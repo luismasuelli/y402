@@ -44,6 +44,17 @@ class StorageManager(BaseModel):
 
         raise NotImplementedError
 
+    def abort(self, collection: str, payment_id: uuid4):
+        """
+        Aborts a payment id, removing its record.
+
+        Args:
+            collection: The collection to remove the payment from.
+            payment_id: The id of the payment to remove.
+        """
+
+        raise NotImplementedError
+
     def settle(self, collection: str, payment_id: uuid4, transaction: str):
         """
         Confirms a given payment id, meaning that the /settle endpoint worked.
