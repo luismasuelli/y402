@@ -56,24 +56,6 @@ export abstract class StorageManager<P = unknown, R = unknown> {
     ): void | Promise<void>;
 
     /**
-     * Tries to find a non-batched record and batches it for the chosen
-     * worker. The worker will make use of batched records later and then
-     * proceed to do appropriate payments.
-     * @param collection The collection to batch a payment for a worker.
-     * @param webhookName The name of the webhook the records must have
-     * to be batched by this method. Many workers may batch for the same
-     * webook name.
-     * @param workerId The id of the worker to use for batching.
-     * @param batchSize The size of the batch to work with.
-     */
-    abstract batchOne(
-        collection: string,
-        webhookName: string,
-        workerId: string,
-        batchSize: number
-    ): boolean | Promise<boolean>;
-
-    /**
      * Returns the current batch of records for the given worker and webhook name.
      * @param collection The collection to batch a payment for a worker.
      * @param webhookName The name of the webhook the records must have to be
