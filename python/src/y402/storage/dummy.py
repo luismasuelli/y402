@@ -32,6 +32,13 @@ class StorageManager(BaseStorageManager):
         Dummy implementation of settle(collection, payment_id, transaction). It's a no-op.
         """
 
+    def batch_one(self, collection: str, webhook_name: str, worker_id: str, batch_size: int) -> bool:
+        """
+        Dummy implementation of batch_one(collection, webhook_name, worker_id, batch_size). It's a no-op.
+        """
+
+        return False
+
     def get_batch(self, collection: str, webhook_name: str, worker_id: str) -> List[SettledPayment]:
         """
         Dummy implementation of get_batch(collection, webhook_name, worker_id). It's a no-op.
