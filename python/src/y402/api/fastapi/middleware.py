@@ -11,6 +11,7 @@ from .request_data import resolve_endpoint, get_root_url
 from .response_presets import x402_response, response
 from .types.endpoint_settings import X402EndpointSettings, Y402_ENDPOINT_SETTINGS
 from ...storage.base import StorageManager
+from ...storage.dummy import StorageManager as DummyStorageManager
 from ...core.types.facilitator import FacilitatorConfig
 from ...core.types.paywall import PaywallConfig
 from ...core.types.registry import FinalEndpointSetupRegistry
@@ -91,14 +92,16 @@ def payment_required(
         facilitator_config: The configuration for the facilitator.
         setup: The general, middleware-wide, setup.
         client_http_library: The allowed client library (to make new HTTP calls with).
-        storage_manager: The default storage manager. If not set, it must set on each of the endpoints
-                         configured to be Y402-defined. Storage managers are used to store the requested
-                         and paid-for jobs.
+        storage_manager: The default storage manager. If not set, it will use a Dummy storage
+                         manager, which is a no-op. Non-dummy Storage managers are used to store
+                         the requested and paid-for jobs. Using a dummy storage manager forfeits
+                         the webhook-related logic and relies on standard x402 practices.
 
     Returns:
         A middleware function.
     """
 
+    storage_manager = storage_manager or DummyStorageManager()
     registry = FinalEndpointSetupRegistry(setup)
 
     async def middleware(request: Request, call_next: Callable):
