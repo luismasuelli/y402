@@ -1,6 +1,9 @@
 import { z } from "zod";
 
 
+/**
+ * This class holds the identity of a payment.
+ */
 export const PaymentIdentitySchema = z.object({
     resource: z
         .string()
@@ -27,9 +30,16 @@ as it is used to identify the payment`
         )
 });
 
+
+/**
+ * This class holds the identity of a payment.
+ */
 export type PaymentIdentity = z.infer<typeof PaymentIdentitySchema>;
 
 
+/**
+ * This class stands for the payment details (source address, amount, token, ...).
+ */
 export const PaymentDetailsSchema = z.object({
     // Canonic fields.
     payer: z
@@ -80,9 +90,19 @@ unless one is stated`
         )
 });
 
+
+/**
+ * This class stands for the payment details (source address, amount, token, ...).
+ */
 export type PaymentDetails = z.infer<typeof PaymentDetailsSchema>;
 
 
+/**
+ * This class stands for a settled payment. Settled
+ * payments are notified via a custom webhook URL
+ * (POST method) so the customers can make use of
+ * it when attending the request.
+ */
 export const SettledPaymentSchema = z.object({
     id: z
         .string()
@@ -113,4 +133,11 @@ export const SettledPaymentSchema = z.object({
         .describe(`The 0x-prefixed transaction hash`)
 });
 
+
+/**
+ * This class stands for a settled payment. Settled
+ * payments are notified via a custom webhook URL
+ * (POST method) so the customers can make use of
+ * it when attending the request.
+ */
 export type SettledPayment = z.infer<typeof SettledPaymentSchema>;
