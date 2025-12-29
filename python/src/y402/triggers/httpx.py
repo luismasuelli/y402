@@ -28,7 +28,7 @@ async def send_payment(webhook_url: str, settled_payment: SettledPayment,
         'Accept': 'application/json'
     }
     if api_key:
-        headers['Authorization'] = 'Bearer ' + api_key
+        headers['X-API-Key'] = api_key
     if timeout < 1:
         timeout = 1
 
