@@ -220,6 +220,9 @@ require_payment = payment_required(
 )
 ```
 
+_`storage_manager` is optional - if not specified, standard x402 flow will apply, but
+with no external webhook workers or out-of-the-box payments storage and tracking._
+
 The same @require_payment operator can be used multiple times.
 
 In order to use this in a Flask endpoint (this decorator is used endpoint-wise):
@@ -387,6 +390,9 @@ app.middleware("http")(
 app.include_router(...)
 ```
 
+_`storage_manager` is optional - if not specified, standard x402 flow will apply, but
+with no external webhook workers or out-of-the-box payments storage and tracking._
+
 Then, in the routers, ensure to have this structure:
 
 ```python
@@ -425,8 +431,15 @@ async def endpoint(...):
 
 ## Usage (endpoint dispatcher)
 
-The endpoint dispatcher is a kind of worker that should run forever. This
-endpoint performs the following cycle:
+The endpoint dispatcher is a kind of worker that should run forever.
+
+_Please note: This worker relies on having a non-dummy storage manager,
+both in the payment server and in the worker. If there's a mismatch,
+or the server uses a dummy storage manager (in particular, when not
+specifying a storage manager at all), then this worker will not batch
+and send any payment from that server._
+
+This worker performs the following cycle:
 
 1. Takes the settled, but not finished, payments _of certain type_.
    This _type_ will match, actually, the `webhook_name=` argument
@@ -516,7 +529,8 @@ The important parts are:
     // The uuid of the payment.
     'id': 'dce92a17-63c5-468e-8d5b-d5fd08b79d63',
     
-    // The version of the protocol.
+    // The version of the protocol. So far, only the first
+    // version of the protocol is supported.
     'version': 1,
 
     // The identity / taxonomy of the involved resource.
