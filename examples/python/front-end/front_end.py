@@ -19,7 +19,7 @@ match INTERNAL_CLIENT_LIBRARY:
     case "requests":
         from y402.clients.requests import y402_requests as make_client
     case _:
-        raise Exception("Invalid WORKER_INTERNAL_CLIENT_LIBRARY: must be httpx, httpx_sync or requests")
+        raise Exception("Invalid FRONTEND_INTERNAL_CLIENT_LIBRARY: must be httpx, httpx_sync or requests")
 
 
 match SERVER_TYPE:
