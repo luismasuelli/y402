@@ -89,7 +89,7 @@ class StorageManager(BaseStorageManager):
 
     def abort(self, collection: str, payment_id: uuid4):
         """
-        Aborts a payment id, removing its record.
+        Aborts a payment id, marking its record.
 
         Args:
             collection: The collection to remove the payment from.
@@ -98,7 +98,7 @@ class StorageManager(BaseStorageManager):
 
         collection_: Collection = self._database[collection]
 
-        collection_.delete_one({"payment_id": str(payment_id), "status": "verified"})
+        collection_.update_one({"payment_id": str(payment_id)}, {"status": "aborted"})
 
     def settle(self, collection: str, payment_id: uuid4, transaction: str):
         """
