@@ -1,8 +1,8 @@
 import base64
 import json
 from typing import Dict, Any, Tuple
-from ...core.types.client import PaymentPayload
-from ...core.types.setup import Y402Setup
+from ..types.client import PaymentPayload
+from ..types.setup import Y402Setup
 from .signature import check_signature
 
 
