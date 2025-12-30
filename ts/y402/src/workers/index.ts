@@ -1,5 +1,5 @@
-import { StorageManager } from "y402/src/storage/base";
-import type { SettledPayment } from "y402/src/types/payment";
+import { StorageManager } from "../storage/base";
+import type { SettledPayment } from "../types/payment";
 
 
 export interface Logger {
