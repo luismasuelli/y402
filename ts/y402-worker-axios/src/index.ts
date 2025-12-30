@@ -2,15 +2,17 @@ import axios, {AxiosInstance, AxiosRequestConfig} from "axios";
 import { StorageManager } from "y402/src/storage/base";
 import type { SettledPayment } from "y402/src/types/payment";
 
-// Minimal logger interface; you can adapt to your logging setup.
+
 export interface Logger {
     info: (...args: any[]) => void;
     error: (...args: any[]) => void;
 }
 
+
 async function maybeAwait<T>(value: T | Promise<T>): Promise<T> {
     return value;
 }
+
 
 const defaultLogger: Logger = console;
 
@@ -43,7 +45,7 @@ async function sendBatch(
     const sendOne = async (payload: SettledPayment): Promise<void> => {
         try {
             const response = await client.post(
-                webhookUrl, payload,{ headers } as AxiosRequestConfig
+                webhookUrl, payload, { headers } as AxiosRequestConfig
             );
             // Throws if HTTP status >= 400
             // (axios throws automatically on non-2xx by default)

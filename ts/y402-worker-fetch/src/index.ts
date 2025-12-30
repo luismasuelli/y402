@@ -1,12 +1,15 @@
 import { StorageManager } from "y402/src/storage/base";
 import type { SettledPayment } from "y402/src/types/payment";
 
+
 export interface Logger {
     info: (...args: any[]) => void;
     error: (...args: any[]) => void;
 }
 
+
 const defaultLogger: Logger = console;
+
 
 async function maybeAwait<T>(result: T | Promise<T>): Promise<T> {
     return result;
@@ -38,14 +41,17 @@ async function sendBatch(
 
     const sendOne = async (payload: SettledPayment): Promise<void> => {
         try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 15_000);
             const res = await fetch(webhookUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     ...headers
                 },
+                signal: controller.signal,
                 body: JSON.stringify(payload)
-            });
+            }).finally(() => clearTimeout(timeout));
 
             if (!res.ok) {
                 throw new Error(`HTTP error ${res.status}`);
