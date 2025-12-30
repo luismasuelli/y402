@@ -113,18 +113,22 @@ export type HeadersObject = Record<string, unknown>;
 export type HeadersSyncFactory = () => HeadersObject;
 export type HeadersAsyncFactory = () => Promise<HeadersObject>;
 
+
 export type HeadersValue =
     | HeadersObject
     | HeadersSyncFactory
     | HeadersAsyncFactory;
+
 
 export type FacilitatorHeaders = {
     settle?: HeadersValue;
     verify?: HeadersValue;
 };
 
+
 // Zod representation of the above types (Zod 4.2.1–compatible).
 const HeadersObjectSchema = z.record(z.string(), z.unknown());
+
 
 // We can't use z.function() in schemas in Zod 4.2.1, so we use z.custom.
 const SyncHeadersFnSchema = z.custom<HeadersSyncFactory>(
@@ -132,10 +136,12 @@ const SyncHeadersFnSchema = z.custom<HeadersSyncFactory>(
     "Expected a sync headers factory function"
 );
 
+
 const AsyncHeadersFnSchema = z.custom<HeadersAsyncFactory>(
     (val) => typeof val === "function",
     "Expected an async headers factory function"
 );
+
 
 const HeadersValueSchema = z.union([
     HeadersObjectSchema,
@@ -143,11 +149,13 @@ const HeadersValueSchema = z.union([
     AsyncHeadersFnSchema,
 ]);
 
+
 export const FacilitatorHeadersSchema: z.ZodType<FacilitatorHeaders> =
     z.object({
         settle: HeadersValueSchema.optional(),
         verify: HeadersValueSchema.optional(),
     });
+
 
 /**
  * Configuration for the X402 facilitator service.
