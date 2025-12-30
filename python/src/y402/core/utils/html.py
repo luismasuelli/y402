@@ -1,7 +1,7 @@
 import json
 from typing import List, Optional, Dict, Any
 from .template import PAYWALL_TEMPLATE
-from ..types.facilitator import X402_VERSION
+from ..types.constants import X402_VERSION
 from ..types.paywall import PaywallConfig
 from ..types.requirements import PaymentRequirements
 

@@ -1,7 +1,6 @@
 from typing import List
 from uuid import uuid4
-
-from ..core.types.facilitator import Y402_VERSION
+from ..core.types.constants import Y402_VERSION
 from ..types.payment import SettledPayment, PaymentIdentity, PaymentDetails
 
 
