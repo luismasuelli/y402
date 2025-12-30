@@ -2,8 +2,16 @@
  * Base error, for all the error subclasses of this library.
  */
 export class BaseError extends Error {
-    constructor(message?: string) {
-        super(message);
+    /**
+     * The passed arguments.
+     */
+    args: any[];
+
+    constructor(...args: any[]) {
+        super(args.length === 1 ? (
+            (args[0] === null || args[0] === undefined) ? "" : args[0]
+        ).toString() : JSON.stringify(args));
+        this.args = args;
         this.name = new.target.name;
     }
 }
