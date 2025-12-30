@@ -457,12 +457,6 @@ export class Y402Setup {
      * :return: The new, merged, definition.
      */
     or(other: Y402Setup): Y402Setup {
-        if (!(other instanceof Y402Setup)) {
-            throw new TypeError(
-                `Can only merge Y402Setup (not "${(other as any)?.constructor?.name}") to Y402Setup`
-            );
-        }
-
         const merged = new Y402Setup();
 
         for (const obj of [this, other]) {
