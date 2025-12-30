@@ -8,7 +8,7 @@ import { StorageManager } from "./base";
  * No-op implementation of all StorageManager methods. Used for testing or
  * as a placeholder dependency where a real storage manager is not required.
  */
-export class StorageManagerDummy<P = unknown, R = unknown> extends StorageManager<P, R> {
+export class DummyStorageManager<P = unknown, R = unknown> extends StorageManager<P, R> {
     allocate(
         collection: string,
         paymentId: string,
