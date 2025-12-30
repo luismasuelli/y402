@@ -1,6 +1,21 @@
-export const KNOWN_NETWORKS_AND_TOKENS = {
+export type TokenData = {
+    address: string,
+    name: string,
+    decimals: number,
+    eip712Version: string,
+    symbol: string
+}
+
+
+export type NetworkData = {
+    chain_id: number,
+    tokens: Record<string, TokenData>
+}
+
+
+export const KNOWN_NETWORKS_AND_TOKENS: Record<string, NetworkData> = {
     "base": {
-        "chain_id": 8453,
+        "chain_id": 8543,
         "tokens": {
             "usdc": {
                 "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
@@ -19,7 +34,7 @@ export const KNOWN_NETWORKS_AND_TOKENS = {
         }
     },
     "base-sepolia": {
-        "chain_id": 84532,
+        "chain_id": 85432,
         "tokens": {
             "usdc": {
                 "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
@@ -79,7 +94,6 @@ export const KNOWN_NETWORKS_AND_TOKENS = {
         "chain_id": 1329,
         "tokens": {
             "usdc": {
-                "code": "usdc",
                 "address": "0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392",
                 "name": "USDC",
                 "decimals": 6,
@@ -92,7 +106,6 @@ export const KNOWN_NETWORKS_AND_TOKENS = {
         "chain_id": 1328,
         "tokens": {
             "usdc": {
-                "code": "usdc",
                 "address": "0x4fCF1784B31630811181f670Aea7A7bEF803eaED",
                 "name": "USDC",
                 "decimals": 6,
@@ -105,7 +118,6 @@ export const KNOWN_NETWORKS_AND_TOKENS = {
         "chain_id": 137,
         "tokens": {
             "usdc": {
-                "code": "usdc",
                 "address": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
                 "name": "USD Coin",
                 "decimals": 6,
@@ -118,7 +130,6 @@ export const KNOWN_NETWORKS_AND_TOKENS = {
         "chain_id": 80002,
         "tokens": {
             "usdc": {
-                "code": "usdc",
                 "address": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
                 "name": "USDC",
                 "decimals": 6,
@@ -130,6 +141,6 @@ export const KNOWN_NETWORKS_AND_TOKENS = {
     // These are local development networks only.
     "local": {
         "chain_id": 31337,
-            "tokens": {}
+        "tokens": {}
     }
 }
