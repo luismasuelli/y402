@@ -65,11 +65,19 @@ async function sendBatch(
     // could add an extra loop here.
 }
 
+
 /**
  * Runs the webhook worker loop (async).
  *
- * This is the equivalent of Python's `_webhook_worker`.
  * It loops forever until an error occurs or the caller cancels/ends the process.
+ * @param workerId The id of this worker.
+ * @param webhookName The name of the webhook to look records for.
+ * @param webhookUrl The URL to send requests to.
+ * @param apiKey The api key to use in the X-API-Key header, if any.
+ * @param storageManager The associated storage manager.
+ * @param collection The collection to use with the manager.
+ * @param logger An optional logger.
+ * @param sleepTimeSeconds A sleep time between iterations.
  */
 export async function webhookWorker(
     workerId: string,
