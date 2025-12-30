@@ -27,7 +27,7 @@ type Eip712DomainInfo = {
 
 
 type ResolvedPaymentPrice = [
-    amount: FinalRequiredPaymentDetails["amount_required"],
+    amount: FinalRequiredPaymentDetails["amountRequired"],
     assetAddress: string,
     eip712Domain: Eip712DomainInfo,
 ];
@@ -88,7 +88,7 @@ function resolvePaymentPrice(
             );
 
             return [
-                price as ResolvedPaymentPrice[0],
+                price.toString() as ResolvedPaymentPrice[0],
                 address,
                 { name, version },
             ];
