@@ -196,7 +196,7 @@ export const PaymentRequirementsSchema = z
                 "The 0x-prefixed ethereum address of the asset chosen to make the payment in"
             ),
         extra: z
-            .record(z.any(), z.unknown())
+            .record(z.string(), z.unknown())
             .optional()
             .describe(
                 "Extra data (typically used to state the EIP-712 domain"
@@ -232,7 +232,7 @@ export const FinalRequiredPaymentDetailsSchema = z.object({
         .string()
         .describe("The address to pay to. It must be a valid address"),
     eip712Domain: z
-        .record(z.any(), z.unknown())
+        .record(z.string(), z.unknown())
         .describe(
             "The data related to the eip712 domain for this protocol"
         ),

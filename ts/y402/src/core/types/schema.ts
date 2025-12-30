@@ -5,7 +5,7 @@ import { z } from "zod";
  * and method which are handled by the middleware.
  */
 export const HTTPInputSchema = z.object({
-    queryParams: z.record(z.string()).optional(),
+    queryParams: z.record(z.string(), z.string()).optional(),
     bodyType: z
         .union([
             z.literal("json"),
@@ -15,8 +15,8 @@ export const HTTPInputSchema = z.object({
             z.literal("binary"),
         ])
         .optional(),
-    bodyFields: z.record(z.unknown()).optional(),
-    headerFields: z.record(z.unknown()).optional(),
+    bodyFields: z.record(z.string(), z.unknown()).optional(),
+    headerFields: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type HTTPInput = z.infer<typeof HTTPInputSchema>;
