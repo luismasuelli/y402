@@ -11,17 +11,6 @@ class PriceComputingError(Exception):
     """
 
 
-def _get_chain_id(network: str, setup: Y402Setup):
-    try:
-        int(network)
-        return network
-    except ValueError:
-        try:
-            return setup.get_chain_id(network)
-        except KeyError:
-            raise PriceComputingError("Unsupported network: " + network)
-
-
 def _resolve_payment_price(
     network: str, price: Price, setup: Y402Setup
 ):
