@@ -137,7 +137,7 @@ export async function processPayment(
                 storageManager.settle(
                     storageCollection,
                     paymentId,
-                    settleResponse.transaction,
+                    settleResponse.transaction as string,
                 ),
             );
         }
