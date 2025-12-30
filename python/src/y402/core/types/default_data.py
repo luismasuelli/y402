@@ -79,7 +79,6 @@ KNOWN_NETWORKS_AND_TOKENS = {
         "chain_id": 1329,
         "tokens": {
             "usdc": {
-                "code": "usdc",
                 "address": "0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392",
                 "name": "USDC",
                 "decimals": 6,
@@ -92,7 +91,6 @@ KNOWN_NETWORKS_AND_TOKENS = {
         "chain_id": 1328,
         "tokens": {
             "usdc": {
-                "code": "usdc",
                 "address": "0x4fCF1784B31630811181f670Aea7A7bEF803eaED",
                 "name": "USDC",
                 "decimals": 6,
@@ -105,7 +103,6 @@ KNOWN_NETWORKS_AND_TOKENS = {
         "chain_id": 137,
         "tokens": {
             "usdc": {
-                "code": "usdc",
                 "address": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
                 "name": "USD Coin",
                 "decimals": 6,
@@ -118,7 +115,6 @@ KNOWN_NETWORKS_AND_TOKENS = {
         "chain_id": 80002,
         "tokens": {
             "usdc": {
-                "code": "usdc",
                 "address": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
                 "name": "USDC",
                 "decimals": 6,
