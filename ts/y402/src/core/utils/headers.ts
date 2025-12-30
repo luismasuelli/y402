@@ -6,12 +6,8 @@ import { checkSignature } from "./signature";
 
 /**
  * Determine if request is from a browser vs API client.
- *
- * Args:
- *   headers: Dictionary of request headers (case-insensitive keys).
- *
- * Returns:
- *   True if request appears to be from a browser, False otherwise.
+ * @param headers Dictionary of request headers (case-insensitive keys).
+ * @returns True if request appears to be from a browser, False otherwise.
  */
 export function isBrowserRequest(
     headers: Record<string, unknown>
@@ -29,12 +25,8 @@ export function isBrowserRequest(
 
 /**
  * Decodes a payment header.
- *
- * Args:
- *   paymentHeader: The contents of the payment header.
- *
- * Returns:
- *   The parsed payment payload.
+ * @param paymentHeader The contents of the payment header.
+ * @returns The parsed payment payload.
  */
 export function decodePaymentHeader(paymentHeader: string): PaymentPayload {
     const bytes = toByteArray(paymentHeader);           // base64 decode → Uint8Array
@@ -45,15 +37,11 @@ export function decodePaymentHeader(paymentHeader: string): PaymentPayload {
 
 /**
  * Validates whether the asset in the payment asset header is valid or not.
- *
- * Args:
- *   network: The involved chosen network.
- *   paymentPayload: The provided payment payload.
- *   paymentAssetHeader: The contents of the payment asset header.
- mergedSetup: The current merged setup.
- *
- * Returns:
- *   A tuple (code, address, true) or ("", "", false).
+ * @param network The involved chosen network.
+ * @param paymentPayload The provided payment payload.
+ * @param paymentAssetHeader The contents of the payment asset header.
+ * @param mergedSetup The current merged setup.
+ * @returns A tuple (code, address, true) or ("", "", false).
  */
 export function validatePaymentAsset(
     network: string,

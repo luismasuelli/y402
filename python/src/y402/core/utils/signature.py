@@ -11,13 +11,16 @@ def check_signature(
     Checks that a given payment authorization is OK
     related to the signature itself and the provided
     complementary data related to the token.
-    :param name: The name of the token.
-    :param version: The version of the token.
-    :param chain_id: The chain id of the token.
-    :param asset: The address of the token.
-    :param authorization: The authorization.
-    :param signature: The signature.
-    :return: Whether all that data matches.
+
+    Args:
+        name: The name of the token.
+        version: The version of the token.
+        chain_id: The chain id of the token.
+        asset: The address of the token.
+        authorization: The authorization.
+        signature: The signature.
+    Returns:
+        Whether all that data matches.
     """
 
     typed_data = {

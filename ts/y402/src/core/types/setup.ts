@@ -41,10 +41,8 @@ export class Y402Setup {
      * the network is known (in fact: it will be not
      * considered, but replaced / reset, if it's for
      * a known network name).
-     *
-     * Args:
-     *   network: The network id.
-     *   chain_id: The chain id.
+     * @param network The network id.
+     * @param chainId The chain id.
      */
     addNetwork(network: string, chainId: number = 0): void {
         network = network.trim().toLowerCase();
@@ -76,26 +74,22 @@ export class Y402Setup {
 
     /**
      * Adds a token contract to a specific place.
-     *
-     * Args:
-     *   network: The network name for which the token will be added.
-     *   code: An internal name for this contract, like "usdc". Given
-     *         an existing network and a known code, adding it will
-     *         just use the names of the known data, optionally with
-     *         some overrides (e.g. the version).
-     *   name: A name for this contract. It may be chosen, e.g. "USDC".
-     *   address: The address of the token.
-     *   version: The EIP-712 version of the token. If the token is
-     *            an EIP-3009 token it should have a version. Try
-     *            "1" by default if not, or a value that is sensible
-     *            for the contract itself when trying.
-     *   decimals: The amount of decimals of the token. It MUST match
-     *             the value returned at .decimals() in the token.
-     *   symbol: A symbol for this contract, like $ or €. It is optional.
-     *   default_for_symbol: Whether the current token will be resolved
-     *                       to be the one to use when its symbol is
-     *                       used in a price with that symbol (or no
-     *                       symbol, perhaps).
+     * @param network The network name for which the token will be added.
+     * @param code An internal name for this contract, like "usdc". Given
+     * an existing network and a known code, adding it will just use the
+     * names of the known data, optionally with some overrides (e.g. the
+     * version).
+     * @param name A name for this contract. It may be chosen, e.g. "USDC".
+     * @param address The address of the token.
+     * @param version The EIP-712 version of the token. If the token is
+     * an EIP-3009 token it should have a version. Try "1" by default if
+     * not, or a value that is sensible for the contract itself when trying.
+     * @param decimals The amount of decimals of the token. It MUST match
+     * the value returned at .decimals() in the token.
+     * @param symbol A symbol for this contract, like $ or €. It is optional.
+     * @param defaultForSymbol Whether the current token will be resolved
+     * to be the one to use when its symbol is used in a price with that
+     * symbol (or no symbol, perhaps).
      */
     addToken(
         network: string,
@@ -109,7 +103,7 @@ export class Y402Setup {
         decimals: number = 0,
         symbol: string = "",
         // Whether it's default or not.
-        default_for_symbol: boolean = false
+        defaultForSymbol: boolean = false
     ): void {
         network = network.trim().toLowerCase();
         code = code.trim().toLowerCase();
@@ -164,7 +158,7 @@ export class Y402Setup {
         this._networks[network].tokens[code] = tokenData;
         this._networks[network].tokens_by_address[address] = code;
 
-        if (default_for_symbol) {
+        if (defaultForSymbol) {
             if (!this._default_tokens[network]) {
                 this._default_tokens[network] = {};
             }
@@ -174,11 +168,9 @@ export class Y402Setup {
 
     /**
      * Checks the chosen network and token code to exist.
-     *
-     * Args:
-     *   network: The network name for which the token will be added.
-     *   code: An internal name for an existing token contract in the
-     *         network in this setup.
+     * @param network The network name for which the token will be added.
+     * @param code An internal name for an existing token contract in the
+     * network in this setup.
      */
     private _check_network_and_code(
         network: string,
@@ -208,11 +200,9 @@ export class Y402Setup {
      * Given a network code and a token code, it ensures the token
      * becomes the default one for its symbol (even if for some
      * reason no symbol were to be defined in a token).
-     *
-     * Args:
-     *   network: The network name for which the token will be added.
-     *   code: An internal name for an existing token contract in the
-     *         network in this setup.
+     * @param network The network name for which the token will be added.
+     * @param code An internal name for an existing token contract in the
+     * network in this setup.
      */
     setDefaultForSymbolToken(network: string, code: string): void {
         const [net, c] = this._check_network_and_code(network, code);
@@ -229,11 +219,9 @@ export class Y402Setup {
      * Given a network code and a token code, it ensures the token
      * becomes the default one, this time not for its symbol but
      * instead for when an integer value is used.
-     *
-     * Args:
-     *   network: The network name for which the token will be defaulted.
-     *   code: An internal name for an existing token contract in the
-     *         network in this setup.
+     * @param network The network name for which the token will be defaulted.
+     * @param code An internal name for an existing token contract in the
+     * network in this setup.
      */
     setDefaultToken(network: string, code: string): void {
         const [net, c] = this._check_network_and_code(network, code);
@@ -241,13 +229,9 @@ export class Y402Setup {
     }
 
     /**
-     * Gets the default token of a network
-     *
-     * Args:
-     *   network: The network name for which the token will be defaulted.
-     *
-     * Returns:
-     *   The default token code of that network.
+     * Gets the default token of a network.
+     * @param network The network name for which the token will be defaulted.
+     * @returns The default token code of that network.
      */
     getDefaultToken(network: string): string | null {
         if (!(network in this._networks)) {
@@ -258,14 +242,10 @@ export class Y402Setup {
 
     /**
      * Builds a price label for an amount of a given currency.
-     *
-     * Args:
-     *   value: A decimal representation of the amount.
-     *   decimals: The amount of digits that are decimal places.
-     *   symbol: The currency symbol.
-     *
-     * Returns:
-     *   A textual representation.
+     * @param value A decimal representation of the amount.
+     * @param decimals The amount of digits that are decimal places.
+     * @param symbol The currency symbol.
+     * @returns A textual representation.
      */
     private _get_price_label(value: string, decimals: number, symbol: string) {
         const d = Number(value) / Math.pow(10, decimals);
@@ -274,12 +254,8 @@ export class Y402Setup {
 
     /**
      * Returns the list of registered token (codes) for a network.
-     *
-     * Args:
-     *   network: The network name for which the tokens will be listed.
-     *
-     * Returns:
-     *   The list of registered tokens.
+     * @param network The network name for which the tokens will be listed.
+     * @returns The list of registered tokens.
      */
     listTokens(network: string): string[] {
         network = network.trim().toLowerCase();
@@ -293,14 +269,10 @@ export class Y402Setup {
 
     /**
      * Returns the metadata associated to a token.
-     *
-     * Args:
-     *   network: The network name for which the token will be defaulted.
-     *   code: An internal name for an existing token contract in the
-     *         network in this setup.
-     *
-     * Returns:
-     *   The associated metadata.
+     * @param network The network name for which the token will be defaulted.
+     * @param code An internal name for an existing token contract in the
+     * network in this setup.
+     * @returns The associated metadata.
      */
     getTokenMetadata(
         network: string,
@@ -319,14 +291,10 @@ export class Y402Setup {
 
     /**
      * Returns data associated to a specific token payment.
-     *
-     * Args:
-     *   network: The name of the network.
-     *   token: The address of the token contract.
-     *   value: A decimal representation of the amount.
-     *
-     * Returns:
-     *   A tuple (chain_id, code, name, price_label).
+     * @param network The name of the network.
+     * @param token The address of the token contract.
+     * @param value A decimal representation of the amount.
+     * @returns A tuple (chain_id, code, name, price_label).
      */
     getPaymentData(
         network: string,
@@ -360,12 +328,8 @@ export class Y402Setup {
 
     /**
      * Given a network, returns its chain id.
-     *
-     * Args:
-     *   network: The name of the network.
-     *
-     * Returns:
-     *   An integer being the chain id.
+     * @param network The name of the network.
+     * @returns An integer being the chain id.
      */
     getChainId(network: string): number {
         try {
@@ -379,9 +343,7 @@ export class Y402Setup {
 
     /**
      * Returns the available mapping of name => chain_id.
-     *
-     * Returns:
-     *   A dictionary mapping name => chain_id from this setup.
+     * @returns A dictionary mapping name => chain_id from this setup.
      */
     getChainIdsMapping(): Record<string, number> {
         const result: Record<string, number> = {};
@@ -393,13 +355,9 @@ export class Y402Setup {
 
     /**
      * Given a price label, it tries to parse it.
-     *
-     * Args:
-     *   network: The name of the network.
-     *   label: The label to parse.
-     *
-     * Returns:
-     *   The parsed token price, as (asset code, amount).
+     * @param network The name of the network.
+     * @param label The label to parse.
+     * @returns The parsed token price, as (asset code, amount).
      */
     parsePriceLabel(network: string, label: string): [string, string] {
         label = label.trim();
@@ -452,9 +410,8 @@ export class Y402Setup {
      * definitions in the first operand take precedence when defining
      * networks and tokens, but the definitions in the second operand
      * take precedence when defining defaults.
-     *
-     * :param other: The other setup to merge.
-     * :return: The new, merged, definition.
+     * @param other The other setup to merge.
+     * @returns The new, merged, definition.
      */
     or(other: Y402Setup): Y402Setup {
         const merged = new Y402Setup();
