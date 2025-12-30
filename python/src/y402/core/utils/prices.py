@@ -31,7 +31,7 @@ def _resolve_payment_price(
         except Exception:
             traceback.print_exc()
             raise PriceComputingError("There was an error while computing a price from int")
-        return price, address, {"name": name, "version": version}
+        return str(price), address, {"name": name, "version": version}
     elif isinstance(price, TokenAmount):
         # TokenAmount type - already in atomic units with asset info.
         return (
