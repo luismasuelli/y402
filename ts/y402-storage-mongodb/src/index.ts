@@ -1,7 +1,7 @@
 import { MongoClient, Db, Collection } from "mongodb";
-import { StorageManager as BaseStorageManager } from "y402/src/storage/base";
-import { SettledPaymentSchema } from "y402/src/types/payment";
-import type { SettledPayment } from "y402/src/types/payment";
+import { StorageManager as BaseStorageManager } from "y402";
+import { SettledPaymentSchema } from "y402";
+import type { SettledPayment } from "y402";
 
 
 const DEFAULT_BATCH_SIZE = 50;
