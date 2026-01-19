@@ -1,0 +1,40 @@
+{
+  "name": "y402-client-axios",
+  "version": "1.0.0",
+  "description": "An axios client for x402.",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsup",
+    "lint": "eslint . --ext .ts --fix",
+    "lint:check": "eslint . --ext .ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/parser": "^8.29.1",
+    "buffer": "^6.0.3",
+    "esbuild": "^0.25.4",
+    "eslint": "^9.24.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsdoc": "^50.6.9",
+    "eslint-plugin-prettier": "^5.2.6",
+    "prettier": "3.5.2",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "y402": "file://../y402"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "next": "^16.1.1",
+    "viem": "^2.44.4"
+  }
+}
