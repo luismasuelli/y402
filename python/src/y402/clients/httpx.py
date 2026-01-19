@@ -46,7 +46,7 @@ class HttpxHooks:
 
             data = response.json()
 
-            # Get the X-Payment-Networks response.
+            # Get the X-Payment-Networks response header.
             x_payment_networks = response.headers.get("X-Payment-Networks")
             try:
                 y402_chain_id_by_name = decode_x_payment_networks(x_payment_networks) if x_payment_networks else None
