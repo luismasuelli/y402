@@ -14,8 +14,13 @@ export interface Eip712TypedData {
     message: Record<string, unknown>;
 }
 
-// The signer callback type you asked for
-export type TypedDataSigner = (typedData: Eip712TypedData) => Promise<string>;
+// The signer callback type. It holds the callback
+// function (which signs a typed message) and the
+// available addresses that can be used.
+export type TypedDataSigner = {
+    signer: (typedData: Eip712TypedData) => Promise<string>;
+    addresses: () => Promise<string[]>;
+}
 
 function normalizePrivateKey(pk: string): Hex {
     const trimmed = pk.trim();
@@ -37,7 +42,7 @@ export function createTypedDataSigner(
         const privateKey = normalizePrivateKey(source);
         const account = privateKeyToAccount(privateKey);
 
-        return async (typedData: Eip712TypedData): Promise<string> => {
+        const signer = async (typedData: Eip712TypedData): Promise<string> => {
             const { domain, types, primaryType, message } = typedData;
 
             const signature = await account.signTypedData({
@@ -50,12 +55,19 @@ export function createTypedDataSigner(
             // viem returns `Hex` (`0x...`) which is already a string
             return signature;
         };
+
+        return {
+            signer,
+            addresses: async (): Promise<string[]> => {
+                return [account.address];
+            }
+        }
     }
 
     // --- Case 2: EIP-1193 provider (remote signing) ---
     const provider = source;
 
-    return async (typedData: Eip712TypedData): Promise<string> => {
+    const signer = async (typedData: Eip712TypedData): Promise<string> => {
         const { message } = typedData;
 
         // For TransferWithAuthorization, the signer is the "from" address
@@ -98,4 +110,15 @@ export function createTypedDataSigner(
 
         return sig as string;
     };
+
+    // Return the full object.
+    return {
+        signer,
+        addresses: async (): Promise<string[]> => {
+            return await provider.request({
+                method: "eth_getAccounts",
+                params: []
+            }) as string[];
+        }
+    }
 }
