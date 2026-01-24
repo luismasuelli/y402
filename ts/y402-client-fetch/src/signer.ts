@@ -18,7 +18,7 @@ export interface Eip712TypedData {
 // function (which signs a typed message) and the
 // available addresses that can be used.
 export type TypedDataSigner = {
-    signer: (typedData: Eip712TypedData) => Promise<string>;
+    sign: (typedData: Eip712TypedData) => Promise<string>;
     addresses: () => Promise<string[]>;
 }
 
@@ -42,7 +42,7 @@ export function createTypedDataSigner(
         const privateKey = normalizePrivateKey(source);
         const account = privateKeyToAccount(privateKey);
 
-        const signer = async (typedData: Eip712TypedData): Promise<string> => {
+        const sign = async (typedData: Eip712TypedData): Promise<string> => {
             const { domain, types, primaryType, message } = typedData;
 
             const signature = await account.signTypedData({
@@ -57,7 +57,7 @@ export function createTypedDataSigner(
         };
 
         return {
-            signer,
+            sign,
             addresses: async (): Promise<string[]> => {
                 return [account.address];
             }
@@ -67,7 +67,7 @@ export function createTypedDataSigner(
     // --- Case 2: EIP-1193 provider (remote signing) ---
     const provider = source;
 
-    const signer = async (typedData: Eip712TypedData): Promise<string> => {
+    const sign = async (typedData: Eip712TypedData): Promise<string> => {
         const { message } = typedData;
 
         // For TransferWithAuthorization, the signer is the "from" address
@@ -113,7 +113,7 @@ export function createTypedDataSigner(
 
     // Return the full object.
     return {
-        signer,
+        sign,
         addresses: async (): Promise<string[]> => {
             return await provider.request({
                 method: "eth_getAccounts",
