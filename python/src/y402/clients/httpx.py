@@ -54,6 +54,8 @@ class HttpxHooks:
                 y402_chain_id_by_name = None
 
             payment_response = x402PaymentRequiredResponse(**data)
+            if payment_response.x402_version != 1:
+                raise PaymentError("This client only works on x402 v1")
 
             # Select payment requirements.
             selected_requirements = self.client.select_payment_requirements(
