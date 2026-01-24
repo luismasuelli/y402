@@ -52,6 +52,7 @@ class HttpxHooks:
                 y402_chain_id_by_name = decode_x_payment_networks(x_payment_networks) if x_payment_networks else None
             except:
                 y402_chain_id_by_name = None
+            y402_chain_id_by_name = y402_chain_id_by_name or self.client.chain_id_by_name
 
             payment_response = x402PaymentRequiredResponse(**data)
             if payment_response.x402_version != 1:

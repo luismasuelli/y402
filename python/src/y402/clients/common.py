@@ -99,6 +99,12 @@ def sign_payment_header(
 
     nonce_bytes = bytes.fromhex(auth["nonce"])
 
+    if payment_requirements.network not in chain_id_by_name:
+        raise PaymentError(f"The network '{payment_requirements.network}' is not known among the "
+                           f"client's configured networks and either the server is a regular "
+                           f"x402 v1 server, or it does not contain said network among the "
+                           f"advertised networks")
+
     typed_data = {
         "types": {
             "TransferWithAuthorization": [
