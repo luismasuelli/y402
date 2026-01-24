@@ -30,6 +30,14 @@ export async function createSignedHeader(
     requirements: PaymentRequirements,
     chainIdByName: Record<string, string>
 ): Promise<string> {
+    // Check it's a valid network, first.
+    if (!(chainIdByName[requirements.network])) {
+        throw new Error(`The network '${requirements.network}' is not known among the ` +
+                        "client's configured networks and either the server is a regular " +
+                        "x402 v1 server, or it does not contain said network among the " +
+                        "advertised networks");
+    }
+
     // Prepare the header with the authorization and so.
     let header = {
         x402Version,
