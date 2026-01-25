@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
-import {Eip712TypedData, TypedDataSigner} from "./signer.ts";
-import { PaymentRequirements } from "../../types/requirements.ts";
+import { Eip712TypedData, TypedDataSigner } from "./signer";
+import { PaymentRequirements } from "../../types/requirements";
 
 function tokenHex(bytes: number = 32): string {
     const r = globalThis.crypto.getRandomValues(new Uint8Array(32));
