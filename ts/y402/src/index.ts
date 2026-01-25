@@ -12,5 +12,5 @@ export * from "./core/types/facilitator";
 export * from "./core/types/paywall";
 export * from "./core/types/registry";
 export * from "./core/types/requirements";
-export * from "./core/utils/headers";
-export * from "./core/utils/prices";
+export * from "./core/utils/server/headers";
+export * from "./core/utils/server/prices";
