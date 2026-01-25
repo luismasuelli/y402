@@ -1,11 +1,11 @@
-import { MisconfigurationError } from "../types/errors";
+import { MisconfigurationError } from "../../types/errors";
 import {
     FinalRequiredPaymentDetails,
     RequirePaymentDetails,
     Price,
     TokenAmount, FinalRequiredPaymentDetailsSchema,
-} from "../types/requirements";
-import { Y402Setup } from "../types/setup";
+} from "../../types/requirements";
+import { Y402Setup } from "../../types/setup";
 
 
 /**

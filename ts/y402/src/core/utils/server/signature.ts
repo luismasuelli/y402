@@ -3,7 +3,7 @@ import {
     TypedDataDomain,
     TypedDataField,
 } from "ethers";
-import { EIP3009Authorization } from "../types/client";
+import { EIP3009Authorization } from "../../types/client";
 
 
 export function checkSignature(

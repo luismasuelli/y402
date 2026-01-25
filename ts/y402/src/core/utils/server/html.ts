@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { PAYWALL_TEMPLATE } from "./template";
-import { X402_VERSION } from "../types/constants";
-import { PaymentRequirementsSchema, type PaymentRequirements } from "../types/requirements";
-import { type PaywallConfig } from "../types/paywall";
+import { X402_VERSION } from "../../types/constants";
+import { PaymentRequirementsSchema, type PaymentRequirements } from "../../types/requirements";
+import { type PaywallConfig } from "../../types/paywall";
 
 
 // Shape of the window.x402 configuration

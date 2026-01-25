@@ -1,6 +1,6 @@
 import { toByteArray } from "base64-js";
-import { PaymentPayloadSchema, type PaymentPayload } from "../types/client";
-import { Y402Setup } from "../types/setup";
+import { PaymentPayloadSchema, type PaymentPayload } from "../../types/client";
+import { Y402Setup } from "../../types/setup";
 import { checkSignature } from "./signature";
 
 
