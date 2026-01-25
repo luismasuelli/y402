@@ -1,9 +1,7 @@
-import { PaymentRequirements } from "y402";
-import { type TypedDataSigner } from "./signer.ts";
-import { createSignedHeader } from "./header.ts";
+import { PaymentRequirements, type TypedDataSigner, createTypedDataSigner, createSignedHeader } from "y402";
 
 // Exports this signer, so it can be used by the customers.
-export { createTypedDataSigner } from "./signer.ts";
+export { createTypedDataSigner };
 
 /**
  * The payment error.
