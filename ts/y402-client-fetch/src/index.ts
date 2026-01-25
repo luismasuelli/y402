@@ -31,7 +31,7 @@ function defaultPaymentRequirementsSelector(requirements: PaymentRequirements[])
             return requirement;
         }
     }
-    throw new Error("No supported payment scheme found");
+    throw new PaymentError("No supported payment scheme found");
 }
 
 /**
@@ -63,7 +63,7 @@ export function wrapFetch(
     signerAddressSelector ||= async () => {
         const addresses = await signer.addresses();
         if (!addresses.length) {
-            throw new Error("The signer does not have any available address");
+            throw new PaymentError("The signer does not have any available address");
         }
         return addresses[0];
     }
@@ -82,7 +82,7 @@ export function wrapFetch(
             accepts: unknown[];
         };
         if (x402Version !== 1) {
-            throw new Error("This client only works on x402 v1");
+            throw new PaymentError("This client only works on x402 v1");
         }
 
         // Get the X-Payment-Networks response header.
@@ -110,8 +110,7 @@ export function wrapFetch(
                 "X-PAYMENT": paymentHeader,
                 "X-PAYMENT-ASSET": selected.asset,
                 "Access-Control-Expose-Headers": "X-PAYMENT-RESPONSE, X-PAYMENT-NETWORKS"
-            },
-            __is402Retry: true
+            }
         };
         return await fetch(input, newInit);
     }
