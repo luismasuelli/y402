@@ -14,3 +14,5 @@ export * from "./core/types/registry";
 export * from "./core/types/requirements";
 export * from "./core/utils/server/headers";
 export * from "./core/utils/server/prices";
+export * from "./core/utils/client/headers";
+export * from "./core/utils/client/signer";
