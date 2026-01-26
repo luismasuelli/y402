@@ -1,6 +1,7 @@
 import {
-    PaymentRequirements, type TypedDataSigner, createSignedHeader, decodeHeader,
-    PaymentError, defaultPaymentRequirementsSelector, PaymentRequiredSelector
+    PaymentRequirements, client,
+    type TypedDataSigner,
+    type PaymentRequiredSelector
 } from "y402";
 
 /**
@@ -20,16 +21,16 @@ export function wrapFetch(
     paymentRequiredSelector: PaymentRequiredSelector | null = null,
     chainIdByName: Record<string, string> | null = null
 ) {
-    paymentRequiredSelector ||= defaultPaymentRequirementsSelector;
+    paymentRequiredSelector ||= client.payments.defaultPaymentRequirementsSelector;
     signerAddressSelector ||= async () => {
         const addresses = await signer.addresses();
         if (!addresses.length) {
-            throw new PaymentError("The signer does not have any available address");
+            throw new client.errors.PaymentError("The signer does not have any available address");
         }
         return addresses[0];
     }
 
-    return async (input, init) => {
+    return async (input: any, init: any) => {
         // First, execute the naive call. If it does not return
         // a 402 call, return.
         const response = await fetch(input, init);
@@ -43,23 +44,25 @@ export function wrapFetch(
             accepts: unknown[];
         };
         if (x402Version !== 1) {
-            throw new PaymentError("This client only works on x402 v1");
+            throw new client.errors.PaymentError("This client only works on x402 v1");
         }
 
         // Get the X-Payment-Networks response header.
         const xPaymentNetworksHeader = response.headers.get("X-Payment-Networks")
         let chainIdByName_ = null;
         try {
-            chainIdByName_ = xPaymentNetworksHeader ? decodeHeader(xPaymentNetworksHeader) : null;
+            chainIdByName_ = xPaymentNetworksHeader ? client.headers.decodeNetworksHeader(xPaymentNetworksHeader) : null;
         } catch {}
         chainIdByName_ ||= chainIdByName || {};
 
         // Get the selected payment, or complain.
-        const selected: PaymentRequirements = await paymentRequiredSelector!(accepts || []);
+        const selected: PaymentRequirements = (
+            await paymentRequiredSelector!(accepts as PaymentRequirements[] || [])
+        );
 
         // Make the payment header.
         const address: string = await signerAddressSelector!();
-        const paymentHeader = await createSignedHeader(
+        const paymentHeader = await client.headers.createSignedHeader(
             x402Version, signer, address, selected, chainIdByName_
         );
 
