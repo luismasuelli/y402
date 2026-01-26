@@ -48,7 +48,7 @@ export function wrapFetch(
         }
 
         // Get the X-Payment-Networks response header.
-        const xPaymentNetworksHeader = response.headers.get("X-Payment-Networks")
+        const xPaymentNetworksHeader = response.headers.get("X-Payment-Networks");
         let chainIdByName_ = null;
         try {
             chainIdByName_ = xPaymentNetworksHeader ? client.headers.decodeNetworksHeader(xPaymentNetworksHeader) : null;
