@@ -16,3 +16,5 @@ export * from "./core/utils/server/headers";
 export * from "./core/utils/server/prices";
 export * from "./core/utils/client/headers";
 export * from "./core/utils/client/signer";
+export * from "./core/utils/client/errors";
+export * from "./core/utils/client/payments";
