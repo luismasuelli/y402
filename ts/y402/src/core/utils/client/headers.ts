@@ -15,6 +15,15 @@ function safeBase64Encode(data: string): string {
 }
 
 /**
+ * Decodes a JSON header.
+ * @param header The header.
+ */
+export function decodeHeader(header: string): string {
+    const decoded = Buffer.from(header, "base64").toString("utf-8");
+    return JSON.parse(decoded);
+}
+
+/**
  * Creates a signed header for x402.
  * @param x402Version The version (only `1` is allowed by this point).
  * @param signer The signer, which can have many addresses if it's an EIP-1193-backed object.
