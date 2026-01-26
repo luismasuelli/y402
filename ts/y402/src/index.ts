@@ -12,9 +12,35 @@ export * from "./core/types/facilitator";
 export * from "./core/types/paywall";
 export * from "./core/types/registry";
 export * from "./core/types/requirements";
-export * from "./core/utils/server/headers";
-export * from "./core/utils/server/prices";
-export * from "./core/utils/client/headers";
-export * from "./core/utils/client/signer";
-export * from "./core/utils/client/errors";
-export * from "./core/utils/client/payments";
+
+// Tools used by server libraries.
+import * as serverHeaders from "./core/utils/server/headers";
+import * as serverPrices from "./core/utils/server/prices";
+export const server = {
+    headers: serverHeaders,
+    prices: serverPrices
+};
+
+// Tools used by client libraries.
+import * as clientHeaders from "./core/utils/client/headers";
+import * as clientSigner from "./core/utils/client/signer";
+import * as clientErrors from "./core/utils/client/errors";
+import * as clientPayments from "./core/utils/client/payments";
+export const client = {
+    headers: {
+        ...clientHeaders
+    },
+    signer: {
+        ...clientSigner
+    },
+    errors: {
+        ...clientErrors
+    },
+    payments: {
+        ...clientPayments
+    }
+};
+export type TypedDataSigner = clientSigner.TypedDataSigner;
+export type Eip1193Provider = clientSigner.Eip1193Provider;
+export type Eip712TypedData = clientSigner.Eip712TypedData;
+export type PaymentRequiredSelector = clientPayments.PaymentRequiredSelector;

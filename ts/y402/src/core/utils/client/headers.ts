@@ -15,12 +15,12 @@ function safeBase64Encode(data: string): string {
 }
 
 /**
- * Decodes a JSON header.
+ * Decodes the x-payment-networks header.
  * @param header The header.
  */
-export function decodeHeader(header: string): string {
+export function decodeNetworksHeader(header: string): Record<string, string> {
     const decoded = Buffer.from(header, "base64").toString("utf-8");
-    return JSON.parse(decoded);
+    return JSON.parse(decoded) as Record<string, string>;
 }
 
 /**
