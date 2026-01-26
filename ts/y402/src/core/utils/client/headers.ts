@@ -24,6 +24,28 @@ export function decodeHeader(header: string): string {
 }
 
 /**
+ * The payment error.
+ */
+export class PaymentError extends Error {
+    constructor(message: string) {
+        super(message);
+    }
+}
+
+/**
+ * A default selector of payment requirements
+ * @param requirements
+ */
+export function defaultPaymentRequirementsSelector(requirements: PaymentRequirements[]): PaymentRequirements {
+    for(let requirement of requirements) {
+        if (requirement.scheme === "exact") {
+            return requirement;
+        }
+    }
+    throw new PaymentError("No supported payment scheme found");
+}
+
+/**
  * Creates a signed header for x402.
  * @param x402Version The version (only `1` is allowed by this point).
  * @param signer The signer, which can have many addresses if it's an EIP-1193-backed object.
