@@ -6,13 +6,13 @@ import {
 
 /**
  * Creates a wrapped version of fetch, which uses x402 when
- * the endpoint's flow requires it. This requires the following
- * elements:
- * 1. The original fetch function, or another wrapper.
- * 2. The signer, created with createTypedDataSigner.
- * 3. A function that chooses an address, which must be among (await signer.addresses()).
- * 4. A selector over the payments.
- * 5. Optionally, a default mapping of chain ids by their names.
+ * the endpoint's flow requires it.
+ * @param fetch The original fetch function, or another wrapper.
+ * @param signer 2. The signer, created with createTypedDataSigner.
+ * @param signerAddressSelector A function that chooses an address, which must be among (await signer.addresses()).
+ * @param paymentRequiredSelector A selector over the payments.
+ * @param chainIdByName Optionally, a default mapping of chain ids by their names.
+ * @returns The wrapped function.
  */
 export function wrapFetch(
     fetch: typeof globalThis.fetch,
