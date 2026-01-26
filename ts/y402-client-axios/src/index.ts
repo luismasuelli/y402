@@ -1,4 +1,5 @@
 import {
-    PaymentRequirements, type TypedDataSigner, createSignedHeader, decodeHeader,
-    PaymentError, defaultPaymentRequirementsSelector, PaymentRequiredSelector
+    PaymentRequirements, client,
+    type TypedDataSigner,
+    type PaymentRequiredSelector
 } from "y402";
