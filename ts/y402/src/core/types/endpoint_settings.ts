@@ -119,8 +119,8 @@ export type X402EndpointSettings = z.infer<typeof X402EndpointSettingsSchema>;
  *   const settings = createX402EndpointSettings({...});
  *   export const handler = withX402EndpointSettings(settings)(async (req,res)=>{...});
  */
-export function withX402EndpointSettings(
-    settings: X402EndpointSettings
+export function withX402EndpointSettings<C extends X402EndpointSettings>(
+    settings: C
 ) {
     return function <T extends Function>(endpoint: T): T {
         (endpoint as any)[Y402_ENDPOINT_SETTINGS] = settings;
