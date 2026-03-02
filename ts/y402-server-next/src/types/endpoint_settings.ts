@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
     RequirePaymentDetails,
+    Y402_ENDPOINT_SETTINGS as BASE_Y402_ENDPOINT_SETTINGS,
     X402EndpointSettingsSchema as BaseX402EndpointSettingsSchema,
     withX402EndpointSettings as baseWithX402EndpointSettings
 } from "y402";
@@ -25,6 +26,7 @@ export const X402EndpointSettingsSchema = BaseX402EndpointSettingsSchema.extend(
     paymentDetails: z.custom<PaymentDetailsType>()
 });
 export type X402EndpointSettings = z.infer<typeof X402EndpointSettingsSchema>;
+export const Y402_ENDPOINT_SETTINGS = BASE_Y402_ENDPOINT_SETTINGS;
 
 /**
  * The decorator to apply these settings.
