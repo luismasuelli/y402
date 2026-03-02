@@ -44,7 +44,7 @@ def create_x402_config(
         "testnet": testnet,
         "currentUrl": current_url,
         "error": error,
-        "x402_version": X402_VERSION,
+        "x402Version": X402_VERSION,
         "cdpClientKey": config.get("cdp_client_key", ""),
         "appName": config.get("app_name", ""),
         "appLogo": config.get("app_logo", ""),
