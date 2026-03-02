@@ -135,9 +135,9 @@ export function resolveFinalPayment(
     return FinalRequiredPaymentDetailsSchema.parse({
         scheme: requiredPayment.scheme,
         network: requiredPayment.network,
-        pay_to_address: requiredPayment.payToAddress,
-        asset_address: address,
-        amount_required: amount,
-        eip712_domain: eip712Domain,
+        payToAddress: requiredPayment.payToAddress,
+        assetAddress: address,
+        amountRequired: amount,
+        eip712Domain,
     });
 }
