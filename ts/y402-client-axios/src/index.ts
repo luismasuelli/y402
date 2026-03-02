@@ -21,6 +21,15 @@ export function wrapAxiosInstance(
     paymentRequiredSelector: PaymentRequiredSelector | null = null,
     chainIdByName: Record<string, string> | null = null
 ) {
+    paymentRequiredSelector ||= client.payments.defaultPaymentRequirementsSelector;
+    signerAddressSelector ||= async () => {
+        const addresses = await signer.addresses();
+        if (!addresses.length) {
+            throw new client.errors.PaymentError("The signer does not have any available address");
+        }
+        return addresses[0];
+    };
+
     axiosClient.interceptors.response.use(
         response => response,
         async (error: AxiosError) => {
@@ -67,6 +76,7 @@ export function wrapAxiosInstance(
 
                 (originalConfig as { __is402Retry?: boolean }).__is402Retry = true;
                 originalConfig.headers["X-PAYMENT"] = paymentHeader;
+                originalConfig.headers["X-PAYMENT-ASSET"] = selected.asset;
                 originalConfig.headers["Access-Control-Expose-Headers"] = "X-PAYMENT-RESPONSE, X-PAYMENT-NETWORKS";
 
                 return await axiosClient.request(originalConfig);
