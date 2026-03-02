@@ -12,6 +12,7 @@ export * from "./core/types/facilitator";
 export * from "./core/types/paywall";
 export * from "./core/types/registry";
 export * from "./core/types/requirements";
+export * from "./core/types/responses";
 
 // Tools used by server libraries.
 import * as serverHeaders from "./core/utils/server/headers";
@@ -44,3 +45,4 @@ export type TypedDataSigner = clientSigner.TypedDataSigner;
 export type Eip1193Provider = clientSigner.Eip1193Provider;
 export type Eip712TypedData = clientSigner.Eip712TypedData;
 export type PaymentRequiredSelector = clientPayments.PaymentRequiredSelector;
+export type { PaymentPayload } from "./core/types/client";
