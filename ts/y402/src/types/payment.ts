@@ -120,9 +120,8 @@ export const SettledPaymentSchema = z.object({
         `The details of the payment (token, network, ...)`
     ),
 
-    // Using ISO 8601 timestamp strings; use z.coerce.date() if Date objects are preferred.
     settled_on: z
-        .iso.datetime()
+        .date()
         .optional()
         .describe(`The time this payment was settled on`),
 
