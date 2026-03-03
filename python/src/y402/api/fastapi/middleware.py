@@ -287,7 +287,7 @@ def payment_required(
         except:
             logger.exception("An exception occurred when interacting with the facilitator or forwarding "
                              "the payment:")
-            return x402_response(request, "The payment was invalid or it was an error processing it",
+            return x402_response(request, "The payment was invalid or there was an error processing it",
                                  custom_paywall_html_, paywall_config_, payment_requirements, chain_id_by_name)
 
         # 12. Finally, return the internal response.
