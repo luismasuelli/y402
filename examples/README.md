@@ -7,3 +7,5 @@ This directory contains examples. In order to run them:
 
 2. Follow the `python/`-related [README.md file](python/README.md), in all the relevant combinations, to make 
    sure everything works.
+3. Follow the `ts/`-related [README.md file](ts/README.md), in all the relevant combinations, to make
+   sure everything works.
