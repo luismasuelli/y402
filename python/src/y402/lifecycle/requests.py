@@ -76,9 +76,8 @@ def process_payment(
     facilitator_client.verify(VerifyRequest(
         x402Version=X402_VERSION,
         paymentPayload=payment,
-        paymentRequirements=matched_requirements,
-        timeout=request_timeout
-    ))
+        paymentRequirements=matched_requirements
+    ), timeout=request_timeout)
 
     # 4. Store the verified payment. Done so, if the settlement
     #    fails and the client complains that the authorization

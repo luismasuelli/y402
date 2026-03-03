@@ -97,9 +97,8 @@ async def process_payment(
         settle_response = await facilitator_client.settle(SettleRequest(
             x402Version=X402_VERSION,
             paymentPayload=payment,
-            paymentRequirements=matched_requirements,
-            timeout=request_timeout
-        ))
+            paymentRequirements=matched_requirements
+        ), timeout=request_timeout)
 
         # 7. Here, the response was successful in terms of HTTP (200)
         #    and the settling was successful as well.
