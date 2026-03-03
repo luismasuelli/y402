@@ -1,0 +1,19 @@
+{
+  "name": "y402-example-front-end",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx front_end.ts"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "y402": "file:../../../ts/y402",
+    "y402-client-axios": "file:../../../ts/y402-client-axios",
+    "y402-client-fetch": "file:../../../ts/y402-client-fetch"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3"
+  }
+}
