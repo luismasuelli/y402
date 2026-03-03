@@ -60,7 +60,7 @@ export async function createSignedHeader(
                 value: requirements.maxAmountRequired,
                 validAfter: String(Math.floor(Date.now() / 1000 - 60)),
                 validBefore: String(Math.floor(Date.now() / 1000) + requirements.maxTimeoutSeconds),
-                nonce: tokenHex(),
+                nonce: "0x" + tokenHex(),
             },
         },
     }
