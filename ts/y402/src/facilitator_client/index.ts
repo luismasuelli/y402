@@ -138,7 +138,7 @@ export class FacilitatorClient {
     }
 
     protected parseSettleObj(obj: Record<string, unknown>): SettleResponse {
-        const parsed = new SettleResponseSchema.parse(obj);
+        const parsed = SettleResponseSchema.parse(obj);
         if (!parsed.success) {
             throw new SettleFacilitatorFailedError(parsed);
         }
