@@ -1,0 +1,21 @@
+{
+  "name": "y402-example-express-stack",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "api": "tsx payment_api.ts",
+    "facilitator": "tsx fake_facilitator.ts",
+    "webhooks": "tsx dumb_webhooks.ts"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "y402": "file:../../../ts/y402",
+    "y402-server-express": "file:../../../ts/y402-server-express",
+    "y402-storage-mongodb": "file:../../../ts/y402-storage-mongodb"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3"
+  }
+}
