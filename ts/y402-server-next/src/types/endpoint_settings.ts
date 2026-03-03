@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
     RequirePaymentDetails,
     Y402_ENDPOINT_SETTINGS as BASE_Y402_ENDPOINT_SETTINGS,
+    type X402EndpointSettings as BaseX402EndpointSettings,
     X402EndpointSettingsSchema as BaseX402EndpointSettingsSchema,
     withX402EndpointSettings as baseWithX402EndpointSettings
 } from "y402";
@@ -22,10 +23,16 @@ export type PaymentDetailsType =
  * by its arrival the payment was already sent to the webhook. This
  * schema extends the previous one by adding the payment details.
  */
-export const X402EndpointSettingsSchema = BaseX402EndpointSettingsSchema.extend({
-    paymentDetails: z.custom<PaymentDetailsType>()
-});
-export type X402EndpointSettings = z.infer<typeof X402EndpointSettingsSchema>;
+export type X402EndpointSettings =
+    Omit<BaseX402EndpointSettings, "paymentDetails"> & {
+    paymentDetails: PaymentDetailsType;
+};
+
+export const X402EndpointSettingsSchema: z.ZodType<X402EndpointSettings> =
+    BaseX402EndpointSettingsSchema.extend({
+        paymentDetails: z.custom<PaymentDetailsType>()
+    }) as unknown as z.ZodType<X402EndpointSettings>;
+
 export const Y402_ENDPOINT_SETTINGS = BASE_Y402_ENDPOINT_SETTINGS;
 
 /**
