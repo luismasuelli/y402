@@ -395,7 +395,7 @@ export function paymentRequired(
         } catch {
             return x402Response(
                 request,
-                "The payment was invalid or it was an error processing it",
+                "The payment was invalid or there was an error processing it",
                 customPaywallHtmlValue,
                 paywallConfigValue,
                 paymentRequirements,
