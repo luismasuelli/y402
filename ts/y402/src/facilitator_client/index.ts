@@ -71,7 +71,7 @@ export class FacilitatorClient {
     }
 
     protected parseVerifyObj(obj: Record<string, unknown>): VerifyResponse {
-        const parsed = new VerifyResponseSchema.parse(obj);
+         const parsed = VerifyResponseSchema.parse(obj);
         if (!parsed.isValid) {
             throw new VerifyFacilitatorInvalidError(parsed);
         }
