@@ -25,6 +25,12 @@ pip install Flask==3.1.2
 pip install fastapi==0.121.1
 ```
 
+For Streamlit browser-wallet support:
+
+```shell
+pip install "y402[streamlit]"
+```
+
 ## Usage (client)
 
 Depending on the installed dependency, one of these can be imported:
@@ -75,6 +81,48 @@ depending on the chosen implementation and available dependencies, except that
 it captures the y402/x402-related responses and performs the appropriate logic
 (related to x402 protocol and the y402 extensions described in the main README.md
 file in this repository).
+
+## Usage (Streamlit client)
+
+Streamlit cannot complete interactive wallet authorization inside one blocking
+HTTP call, so the Streamlit adapter returns a small result object with a
+`status` of `success`, `pending` or `error`.
+
+Use `streamlit_browser_web3.wallet_get()` on every rerun and keep using the same
+request `key` while the user is approving the signature in the wallet.
+
+```python
+import streamlit as st
+from streamlit_browser_web3 import wallet_get
+from y402.clients.streamlit.requests import Y402Client
+
+
+wallet = wallet_get()
+client = Y402Client(wallet)
+
+
+if wallet.status != "connected":
+    if st.button("Connect wallet"):
+        wallet.connect()
+else:
+    result = client.get(
+        "https://example.com/protected-resource",
+        key="protected-resource",
+    )
+
+    if result.status == "pending":
+        st.info("Approve the payment signature in your wallet.")
+    elif result.status == "error":
+        st.error(result.error)
+    else:
+        st.write(result.response.json())
+```
+
+There is also an equivalent sync `httpx` wrapper:
+
+```python
+from y402.clients.streamlit.httpx_sync import Y402Client
+```
 
 ## Usage (server)
 
