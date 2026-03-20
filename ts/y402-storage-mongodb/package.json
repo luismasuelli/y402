@@ -33,6 +33,6 @@
     "mongodb": "^7.0.0"
   },
   "peerDependencies": {
-    "y402": "file://../y402"
+    "y402": "^1.0.0"
   }
 }
