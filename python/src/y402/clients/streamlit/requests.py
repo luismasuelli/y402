@@ -30,6 +30,7 @@ class Y402Client:
         wallet,
         payment_requirements_selector=None,
         chain_id_by_name: Optional[Dict[str, int]] = None,
+        account_selector=None,
         session: Optional[requests.Session] = None,
     ):
         self.session = session or requests.Session()
@@ -37,6 +38,7 @@ class Y402Client:
             wallet,
             payment_requirements_selector=payment_requirements_selector,
             chain_id_by_name=chain_id_by_name,
+            account_selector=account_selector,
         )
 
     def request(

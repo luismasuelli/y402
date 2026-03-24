@@ -3,7 +3,7 @@ import json
 import secrets
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, Generic, Literal, Optional, TypeVar
+from typing import Any, Callable, Dict, Generic, Literal, Optional, TypeVar
 from ...core.types.errors import ConditionalDependencyError
 
 
@@ -31,6 +31,7 @@ from ..common import (
 
 ResponseT = TypeVar("ResponseT")
 RequestStatus = Literal["success", "pending", "error"]
+AccountSelectorCallable = Callable[[WalletHandler], str]
 
 
 @dataclass(frozen=True)
@@ -116,12 +117,14 @@ class StreamlitY402Client:
         wallet: WalletHandler,
         payment_requirements_selector: Optional[PaymentSelectorCallable] = None,
         chain_id_by_name: Optional[Dict[str, int]] = None,
+        account_selector: Optional[AccountSelectorCallable] = None,
     ):
         self.wallet = wallet
         self.chain_id_by_name = {**DEFAULT_CHAIN_ID_BY_NAME, **(chain_id_by_name or {})}
         self._payment_requirements_selector = (
             payment_requirements_selector or self.default_payment_requirements_selector
         )
+        self._account_selector = account_selector or self.default_account_selector
 
     @staticmethod
     def default_payment_requirements_selector(
@@ -136,6 +139,22 @@ class StreamlitY402Client:
         self, accepts: list[PaymentRequirements]
     ) -> PaymentRequirements:
         return self._payment_requirements_selector(accepts)
+
+    @staticmethod
+    def default_account_selector(wallet: WalletHandler) -> str:
+        if not wallet.accounts:
+            raise StreamlitWalletNotConnectedError(
+                "Connect a browser wallet before selecting an account."
+            )
+        return wallet.accounts[0]
+
+    def select_account(self) -> str:
+        account = self._account_selector(self.wallet)
+        if account not in self.wallet.accounts:
+            raise StreamlitWalletNotConnectedError(
+                f"The selected account '{account}' is not available in the connected wallet."
+            )
+        return account
 
     def clear_flow(self, key: str) -> None:
         flow = _state().pop(key, None)
@@ -256,6 +275,7 @@ class StreamlitY402Client:
             y402_chain_id_by_name = None
 
         payment_requirements = self.select_payment_requirements(payment_response.accepts)
+        account = self.select_account()
         authorization = self._make_authorization(payment_requirements)
         typed_data = self._make_typed_data(
             payment_requirements=payment_requirements,
@@ -270,7 +290,7 @@ class StreamlitY402Client:
             "payment_requirements": payment_requirements.model_dump(mode="json"),
             "authorization": authorization,
             "typed_data": typed_data,
-            "account": self.wallet.accounts[0],
+            "account": account,
             "payment_header": None,
             "expires_at": int(authorization["validBefore"]),
         }
@@ -360,7 +380,7 @@ class StreamlitY402Client:
     ) -> Dict[str, str]:
         now = int(time.time())
         return {
-            "from": self.wallet.accounts[0],
+            "from": self.select_account(),
             "to": payment_requirements.pay_to,
             "value": payment_requirements.max_amount_required,
             "validAfter": str(now - 60),
