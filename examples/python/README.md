@@ -45,7 +45,6 @@ still configurable (e.g. private keys and so).
    - It accepts endpoints: `/api/webhook/payments1` to `/api/webhook/payments3`. These endpoints
      will be used later.
 2. The `fake_facilitator.py` needs some configuration:
-   - `FACILITATOR_PRIVATE_KEY`: A private key for a local account, with funds, to use to send the transactions.
    - `FACILITATOR_TOKEN_ADDRESS`: The address of the local contract serving as ERC-20/ERC-3009 payment token.
 3. The `payment_api.py` needs some configuration:
    - `SERVER_PAY_TO_ADDRESS`: An address that will receive the payments.
