@@ -1,6 +1,7 @@
 import json
 import secrets
 from typing import Any
+from urllib import request as urllib_request
 import streamlit as st
 from streamlit_browser_web3 import wallet_get
 from y402.clients.common import PaymentError
@@ -13,6 +14,7 @@ CHAIN_ID = 31337
 CHAIN_ID_HEX = hex(CHAIN_ID)
 CHAIN_NAME = "Anvil Local"
 CHAIN_ID_BY_NAME = {"local": CHAIN_ID}
+RPC_URL = "http://127.0.0.1:8545"
 ACTIVE_REQUEST_STATE_KEY = "front_end:streamlit:active_request"
 LAST_RESULT_STATE_KEY = "front_end:streamlit:last_result"
 REQUEST_FLOW_KEY = "front-end:purchase"
@@ -58,6 +60,42 @@ def _parse_json_payload(raw_value: str) -> tuple[dict[str, Any] | None, str | No
         return None, "The JSON body must decode to an object."
 
     return payload, None
+
+
+def _latest_block_timestamp() -> tuple[int | None, str | None]:
+    payload = json.dumps(
+        {
+            "jsonrpc": "2.0",
+            "method": "eth_getBlockByNumber",
+            "params": ["latest", False],
+            "id": 1,
+        }
+    ).encode("utf-8")
+    req = urllib_request.Request(
+        RPC_URL,
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+
+    try:
+        with urllib_request.urlopen(req, timeout=2) as response:
+            body = json.loads(response.read().decode("utf-8"))
+    except Exception as exc:
+        return None, str(exc)
+
+    result = body.get("result")
+    if not isinstance(result, dict):
+        return None, "Invalid eth_getBlockByNumber response."
+
+    raw_timestamp = result.get("timestamp")
+    if not isinstance(raw_timestamp, str):
+        return None, "Missing block timestamp in RPC response."
+
+    try:
+        return int(raw_timestamp, 16), None
+    except ValueError:
+        return None, f"Invalid block timestamp: {raw_timestamp}"
 
 
 def _make_client(client_library: str, wallet, selected_account: str):
@@ -176,6 +214,11 @@ def _execute_active_request(wallet) -> None:
         return
 
     selected_account = active_request["selected_account"]
+    current_timestamp, timestamp_error = _latest_block_timestamp()
+    if current_timestamp is not None:
+        st.info(f"Sending transaction (current timestamp is: {current_timestamp}).")
+    else:
+        st.info(f"Sending transaction (current timestamp unavailable: {timestamp_error}).")
 
     try:
         client = _make_client(
