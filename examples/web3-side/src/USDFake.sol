@@ -224,9 +224,12 @@ contract USDFake is ERC20, EIP712 {
         );
 
         address signer = signature.length == 65 ? _recoverAuthorizationSigner(
-            structHash, signature[64], signature[0:32], signature[32:64]
+            structHash, uint8(signature[64]), bytes32(signature[0:32]), bytes32(signature[32:64])
         ) : (signature.length == 64 ? _recoverAuthorizationSigner(
-            structHash, (signature[0:64] >> 255) + 27, signature[0:32], signature[32:64] && (1 << 255)
+            structHash,
+            uint8((uint256(bytes32(signature[32:64])) >> 255) + 27),
+            bytes32(signature[0:32]),
+            bytes32(uint256(bytes32(signature[32:64])) & ((uint256(1) << 255) - 1))
         ) : address(0));
         require(signer == authorizer, "USDF: invalid signature");
 
