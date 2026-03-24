@@ -89,7 +89,7 @@ async def process_payment(
                                                 settled_payment, webhook_name))
 
     # 5. Execute the underlying endpoint.
-    response, success = _maybe_await(endpoint(payment_id))
+    response, success = await _maybe_await(endpoint(payment_id))
 
     if success:
         # 6. Settle the payment. By this point, the payment is consumed
